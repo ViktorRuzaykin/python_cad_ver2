@@ -2,13 +2,13 @@ from tkinter import Label, Tk, Entry, Button
 from tkinter import messagebox as mb, IntVar, ttk
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Checkbutton, Progressbar, Combobox
-
-import create_profile
+import pythoncom
+from win32ctypes.pywin32 import pywintypes
+import win32api
 import utility
-from arryautocad import acadDoc, APoint
+from arryautocad import Autocad, APoint
 from calculations import Calculations
 from create_profile import CreateProfile
-
 
 final_data_file = None
 
@@ -21,22 +21,30 @@ def open_work_file():
 
 
 def stat_draw():
+    try:
+        acad = Autocad()
+        acadDoc = acad.active_doc
+    except pythoncom.com_error as f:
+        mb.showerror(getattr(f, 'strerror'), getattr(f, 'strerror'))
+
+
     start_pk = float(''.join(start_pk_en.get().split('+')))
     stop_pk = float(''.join(end_pk_en.get().split('+')))
     print(start_pk, stop_pk)
     distance_profile = stop_pk - start_pk
-    new_profile = create_profile.CreateProfile(data_final=final_data_file,
-                                               start_profile=start_pk,
-                                               end_profile=stop_pk,
-                                               distance_profile=distance_profile,
-                                               scale_vertical=float(scale_vertical_en.get()),
-                                               scale_horizontal=float(scale_horizontal_en.get()))
+    new_profile = CreateProfile(data_final=final_data_file,
+                                start_profile=start_pk,
+                                end_profile=stop_pk,
+                                distance_profile=distance_profile,
+                                scale_vertical=float(scale_vertical_en.get()),
+                                scale_horizontal=float(scale_horizontal_en.get()))
 
     chk_state_list = [chk_state_ditch.get(), chk_state_pillow.get(), chk_state_pipe.get(), chk_state_filling.get()]
 
     if final_data_file:
         if start_pk != stop_pk or stop_pk > start_pk:
             if 1 in chk_state_list:
+
                 chk_state_list = [chk_state_ditch.get(), chk_state_pillow.get(), chk_state_pipe.get(),
                                   chk_state_filling.get()]
                 insertion_point = acadDoc.Utility.GetPoint(APoint(0, 0), 'Укажите точку вставки профиля: ')

@@ -1,10 +1,11 @@
 import time
+from tkinter import messagebox as mb
 
 import pythoncom
 
 import parameters
 import utility
-from arryautocad import acad, acadModel, acadDoc
+from arryautocad import Autocad
 from calculations import Calculations
 from profile import ProfileCad
 
@@ -18,10 +19,13 @@ def open_work_file():
 
 class CreateProfile:
     def __init__(self, data_final, start_profile, end_profile, distance_profile, scale_vertical, scale_horizontal):
-        self.acad = acad
-        self.mSp = acadModel
-        self.acadDoc = acadDoc
-        self.profile = ProfileCad(self.mSp, self.acad, self.acadDoc)
+        try:
+            self.acad = Autocad()
+            self.mSp = self.acad.active_model
+            self.acadDoc = self.acad.active_doc
+        except pythoncom.com_error as f:
+            mb.showerror(getattr(f, 'strerror'), getattr(f, 'strerror'))
+        self.profile = ProfileCad(self.mSp, self.acadDoc)
         self.calculations = Calculations
         self.scale_vertical = 1000 / scale_vertical
         self.scale_horizontal = 1000 / scale_horizontal
@@ -109,11 +113,11 @@ class CreateProfile:
             # чертим линию профиля
             conditional_horizon = utility.conditional_horizon(data_for_ditch['new_marks_project_ditch'],
                                                               data_for_ditch['new_marks_actual_earth'])
-            insertion_point_line_1 = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                      insertion_point[1] + 114,
-                                      insertion_point[2]]
+            insertion_point_ditch = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                     insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH),
+                                     insertion_point[2]]
 
-            self.profile.create_line_profile(insertion_point=insertion_point_line_1,
+            self.profile.create_line_profile(insertion_point=insertion_point_ditch,
                                              difference=self.axis_distance_x,
                                              mark=data_for_ditch['new_marks_project_ditch'],
                                              scale_vertical=self.scale_vertical,
@@ -122,10 +126,7 @@ class CreateProfile:
                                              conditional_horizon=conditional_horizon,
                                              vertical_line=False)
 
-            insertion_point_line_2 = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                      insertion_point[1] + 114,
-                                      insertion_point[2]]
-            self.profile.create_line_profile(insertion_point=insertion_point_line_2,
+            self.profile.create_line_profile(insertion_point=insertion_point_ditch,
                                              difference=self.axis_distance_x,
                                              mark=data_for_ditch['new_marks_actual_earth'],
                                              scale_vertical=self.scale_vertical,
@@ -134,7 +135,7 @@ class CreateProfile:
                                              conditional_horizon=conditional_horizon,
                                              vertical_line=True)
 
-            self.profile.create_line_profile(insertion_point=insertion_point_line_2,
+            self.profile.create_line_profile(insertion_point=insertion_point_ditch,
                                              difference=self.axis_distance_x,
                                              mark=data_for_ditch['new_marks_actual_ditch'],
                                              scale_vertical=self.scale_vertical,
@@ -145,7 +146,7 @@ class CreateProfile:
 
             # проставляем проектные отметки траншеи
             insertion_point_mark_1 = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                      insertion_point[1] + 105.50,
+                                      insertion_point[1] + parameters.LEVEL_DITCH_PROJECT,
                                       insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_ditch['new_marks_project_ditch'],
                                        difference=self.axis_distance_x,
@@ -158,7 +159,7 @@ class CreateProfile:
 
             # проставляем пикетаж
             insertion_point_picketing = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                         insertion_point[1] + 86.00,
+                                         insertion_point[1] + parameters.LEVEL_DITCH_PK,
                                          insertion_point[2]]
             self.profile.iter_text_cad(object_cad=self.list_picketing,
                                        difference=self.axis_distance_x,
@@ -171,7 +172,7 @@ class CreateProfile:
 
             # проставляем фактические отметки траншеи
             insertion_point_ditch_actual = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                            insertion_point[1] + 54.50,
+                                            insertion_point[1] + parameters.LEVEL_DITCH_ACTUAL,
                                             insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_ditch['new_marks_actual_ditch'],
                                        difference=self.axis_distance_x,
@@ -184,7 +185,7 @@ class CreateProfile:
 
             # проставляем отметки земли
             insertion_point_earth = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                     insertion_point[1] + 37.50,
+                                     insertion_point[1] + parameters.LEVEL_DITCH_EARTH,
                                      insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_ditch['new_marks_actual_earth'],
                                        difference=self.axis_distance_x,
@@ -197,7 +198,7 @@ class CreateProfile:
 
             # проставляем глубину разработки
             insertion_point_depth = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                     insertion_point[1] + 20.50,
+                                     insertion_point[1] + parameters.LEVEL_DITCH_DEPTH,
                                      insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_ditch['list_depth'],
                                        difference=self.axis_distance_x,
@@ -215,7 +216,7 @@ class CreateProfile:
                                                 self.scale_horizontal)
             self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_DITCH)
             # чертим шкалу профиля
-            insertion_point_scale = [insertion_point[0], insertion_point[1] + 114, insertion_point[2]]
+            insertion_point_scale = [insertion_point[0], insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH), insertion_point[2]]
             height_scale = utility.height_scale(data_for_ditch['new_marks_project_ditch'],
                                                 data_for_ditch['new_marks_actual_earth'])
 
@@ -229,7 +230,8 @@ class CreateProfile:
         except pythoncom.com_error as f:
             print(f)
             print('error ditch')
-            self.profile_ditch(insertion_point)
+            # self.profile_ditch(insertion_point)
+            mb.showerror('Внутренняя ошибка', 'Ошибка отрисовки профиля траншеи')
 
     def _data_for_profile_pillow(self):
         # получаем новый список отметок по подушке проект
@@ -271,7 +273,7 @@ class CreateProfile:
             conditional_horizon = utility.conditional_horizon(data_for_pillow['new_marks_project_pillow'],
                                                               data_for_pillow['new_marks_actual_pillow'])
             insertion_point_line = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                    insertion_point[1] + 97,
+                                    insertion_point[1] + sum(parameters.STEP_HORIZONTAL_PILLOW),
                                     insertion_point[2]]
             # проектная линия профиля подушки
             self.profile.create_line_profile(insertion_point=insertion_point_line,
@@ -294,7 +296,7 @@ class CreateProfile:
 
             # проставляем проектные отметки подушки
             insertion_point_mark_1 = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                      insertion_point[1] + 88.50,
+                                      insertion_point[1] + parameters.LEVEL_PILLOW_PROJECT,
                                       insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_pillow['new_marks_project_pillow'],
                                        difference=self.axis_distance_x,
@@ -307,7 +309,7 @@ class CreateProfile:
 
             # проставляем пикетаж
             insertion_point_picketing = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                         insertion_point[1] + 69.00,
+                                         insertion_point[1] + parameters.LEVEL_PILLOW_PK,
                                          insertion_point[2]]
             self.profile.iter_text_cad(object_cad=self.list_picketing,
                                        difference=self.axis_distance_x,
@@ -319,7 +321,7 @@ class CreateProfile:
                                        dx=parameters.OFFSET_TEXT_LINE)
             # проставляем фактические отметки подушки
             insertion_point_ditch_actual = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                            insertion_point[1] + 37.50,
+                                            insertion_point[1] + parameters.LEVEL_PILLOW_ACTUAL,
                                             insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_pillow['new_marks_actual_pillow'],
                                        difference=self.axis_distance_x,
@@ -331,7 +333,7 @@ class CreateProfile:
                                        dx=parameters.OFFSET_TEXT_LINE)
             # проставляем отклонения по подушке
             insertion_point_difference = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                          insertion_point[1] + 20.50,
+                                          insertion_point[1] + parameters.LEVEL_PILLOW_DIFF,
                                           insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_pillow['mark_difference'],
                                        difference=self.axis_distance_x,
@@ -348,7 +350,7 @@ class CreateProfile:
                                                 self.scale_horizontal)
             self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_PILLOW)
             # чертим шкалу профиля
-            insertion_point_scale = [insertion_point[0], insertion_point[1] + 97, insertion_point[2]]
+            insertion_point_scale = [insertion_point[0], insertion_point[1] + sum(parameters.STEP_HORIZONTAL_PILLOW), insertion_point[2]]
             height_scale = utility.height_scale(data_for_pillow['new_marks_project_pillow'],
                                                 data_for_pillow['new_marks_actual_pillow'])
 
@@ -360,12 +362,12 @@ class CreateProfile:
                                       text_styles='СПДС')
             self.acadDoc.Utility.Prompt(u'Готово.\n')
 
-
-
         except pythoncom.com_error as f:
             print(f)
             print('error pillow')
-            self.profile_pillow(insertion_point)
+            # self.profile_pillow(insertion_point)
+            mb.showerror('Внутренняя ошибка', 'Ошибка отрисовки профиля подушки')
+
 
 
 """scale_vertical = 200

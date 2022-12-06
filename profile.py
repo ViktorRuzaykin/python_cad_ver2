@@ -1,17 +1,16 @@
 import time
 import parameters
 import utility
-from arryautocad import APoint, aDouble
+from arryautocad import APoint, ADouble
 from import_object_acad import ImportCadObject
 from method_add import AddObject
 
 
 class ProfileCad:
-    def __init__(self, profile, acad, acadDoc):
+    def __init__(self, profile, acadDoc):
         self.add_objects = AddObject()
         self.create_basement_header = ImportCadObject()
         self.mSp = profile
-        self.acad = acad
         self.acadDoc = acadDoc
 
     def iter_text_cad(self, object_cad, difference, point_start, height_text, scale_horizontal, alignment, dx=0,
@@ -76,19 +75,12 @@ class ProfileCad:
         :param vertical_line: флаг для отрисовки вертикальных линий профиля
         :return:
         """
-        print(insertion_point[1])
-        print(mark[0])
-        print(conditional_horizon)
-        print(scale_vertical)
+
         point_1_x = insertion_point[0]
         point_1_y = insertion_point[1] + (mark[0] - conditional_horizon) * scale_vertical
-
         list_point = [point_1_x, point_1_y]
-        print(mark)
         try:
-            print(difference)
             for i, dist in enumerate(difference):
-                print(i, dist, len(difference), len(mark))
                 point_2_x = point_1_x + float(dist) * scale_horizontal
                 point_2_y = point_1_y + ((mark[i + 1] - mark[i]) * scale_vertical)
                 list_point.extend([point_2_x, point_2_y])
@@ -99,7 +91,7 @@ class ProfileCad:
                 list_point.extend([point_1_x, point_1_y])
             if vertical_line:
                 self.mSp.AddLine(APoint(point_1_x, insertion_point[1]), APoint(point_1_x, point_1_y))
-            polyline = self.mSp.AddLightweightPolyline(aDouble(list_point))  # линия профиля
+            polyline = self.mSp.AddLightweightPolyline(ADouble(list_point))  # линия профиля
             polyline.Linetype = line_type  # 'DASHED'
         except (AttributeError, TypeError):
             print('1_ошибка AttributeError, TypeError')

@@ -2,18 +2,18 @@ import json
 import time
 import keyboard
 import arryautocad
-from arryautocad import acad, acadModel, acadDoc, APoint
+from arryautocad import Autocad, APoint
 
 
 class ImportCadObject:
-    try:
-        acad = acad
-        mSp = acadModel
-        acadDoc = acadDoc
-    except OSError:
-        print('AutoCad не доступен')
 
     def __init__(self):
+        try:
+            self.acad = Autocad()
+            self.mSp = self.acad.active_model
+            self.acadDoc = self.acad.active_doc
+        except OSError:
+            print('AutoCad не доступен')
         self.coord_line = {}
         self.info_text = {}
         self.bottom_right_corner_point = []
@@ -45,7 +45,7 @@ class ImportCadObject:
             try:
                 self.bottom_right_corner_point = self.acadDoc.Utility.GetPoint(APoint(0, 0),
                                                                                'Правый нижний угол шапки подвала: \n')
-                selection = arryautocad.get_selection('Выберите объекты подвала.\n')
+                selection = Autocad.get_selection('Выберите объекты подвала.\n')
                 for cad_object in selection:
                     id_object = cad_object.ObjectID
                     if cad_object.ObjectName == 'AcDbLine':

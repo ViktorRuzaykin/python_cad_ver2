@@ -1,8 +1,6 @@
 import csv
 import random
-
 import parameters
-import utility
 
 
 class Calculations:
@@ -200,7 +198,6 @@ class Calculations:
         if info_stop['one_index'] != info_stop['second_index']:
             new_list_data.append(m_stop)
         # print(f'срез - {new_list_data}')
-        print(f'create {new_list_data}')
         return new_list_data
 
     @staticmethod

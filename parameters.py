@@ -22,5 +22,25 @@ PATH_FILE_PIPE = 'труба.txt'
 PATH_FILE_FILLING = 'обсыпка.txt'
 
 STEP_HORIZONTAL_DITCH = [12, 17, 17, 17, 12, 22, 17]  # шаг горизонтальных линий подвала разработки
-STEP_HORIZONTAL_PILLOW = [12, 17, 17, 12, 22, 17]  # шаг горизонтальных линий подвала разработки
-DECIMAL_PLACES = 3
+_step_hor = [12, 17, 17, 12, 22, 17]
+STEP_HORIZONTAL_PILLOW = _step_hor  # шаг горизонтальных линий подвала подушки
+STEP_HORIZONTAL_PIPE = _step_hor  # шаг горизонтальных линий подвала укладки
+STEP_HORIZONTAL_FILLING = _step_hor  # шаг горизонтальных линий подвала обсыпки
+
+DECIMAL_PLACES = 2
+
+LEVEL_DITCH_PROJECT = 105.5
+LEVEL_DITCH_PK = 86.00
+LEVEL_DITCH_ACTUAL = 54.50
+LEVEL_DITCH_EARTH = 37.50
+LEVEL_DITCH_DEPTH = 20.50
+
+
+L1 = 88.50
+L2 = 69.00
+L3 = 37.50
+L4 = 20.50
+LEVEL_PILLOW_PROJECT, LEVEL_PIPE_PROJECT, LEVEL_FILLING_PROJECT = L1, L1, L1
+LEVEL_PILLOW_PK, LEVEL_PIPE_PK, LEVEL_FILLING_PK = L2, L2, L2
+LEVEL_PILLOW_ACTUAL, LEVEL_PIPE_ACTUAL, LEVEL_FILLING_ACTUAL = L3, L3, L3
+LEVEL_PILLOW_DIFF, LEVEL_PIPE_DIFF, LEVEL_FILLING_DIFF = L4, L4, L4
