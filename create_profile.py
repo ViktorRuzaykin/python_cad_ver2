@@ -17,7 +17,7 @@ def open_work_file():
 
 
 class CreateProfile:
-    def __init__(self, data_final, start_profile, end_profile, scale_vertical, scale_horizontal):
+    def __init__(self, data_final, start_profile, end_profile, distance_profile, scale_vertical, scale_horizontal):
         self.acad = acad
         self.mSp = acadModel
         self.acadDoc = acadDoc
@@ -27,6 +27,7 @@ class CreateProfile:
         self.scale_horizontal = 1000 / scale_horizontal
         self.start_profile = start_profile  # [0, 20]
         self.end_profile = end_profile  # [2, 32]
+        self.distance_profile = distance_profile
         self.data_final = data_final
 
         if data_final is not None:
@@ -92,7 +93,7 @@ class CreateProfile:
                                                                         mark_second_earth,
                                                                         self.data_final['mark_earth'])
         # получаем список глубин траншеи
-        list_depth = self.calculations.depth_ditch(new_marks_actual_ditch, new_marks_actual_earth)
+        list_depth = self.calculations.mark_difference(new_marks_actual_ditch, new_marks_actual_earth)
         data_ditch = {'new_marks_project_ditch': new_marks_project_ditch,
                       'new_marks_actual_ditch': new_marks_actual_ditch,
                       'new_marks_actual_earth': new_marks_actual_earth,
@@ -209,7 +210,7 @@ class CreateProfile:
 
             # чертим горизонтальные и вертикальные лини в подвале профиля
             dd = self.end_profile - self.start_profile
-            self.profile.create_horizontal_line(insertion_point, dd, parameters.OFFSET_PROFILE,
+            self.profile.create_horizontal_line(insertion_point, self.distance_profile, parameters.OFFSET_PROFILE,
                                                 parameters.STEP_HORIZONTAL_DITCH,
                                                 self.scale_horizontal)
             self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_DITCH)
@@ -254,16 +255,19 @@ class CreateProfile:
                                                                          mark_one_actual_pillow,
                                                                          mark_second_actual_pillow,
                                                                          self.data_final['actual_pillow'])
+        mark_difference = self.calculations.mark_difference(new_marks_actual_pillow, new_marks_project_pillow)
 
         data_pillow = {
             'new_marks_project_pillow': new_marks_project_pillow,
             'new_marks_actual_pillow': new_marks_actual_pillow,
+            'mark_difference': mark_difference,
         }
         return data_pillow
 
     def profile_pillow(self, insertion_point):
         data_for_pillow = self._data_for_profile_pillow()
         try:
+            self.profile.create_header(insertion_point, parameters.PATH_FILE_PILLOW)  # чертим шапку подвала
             conditional_horizon = utility.conditional_horizon(data_for_pillow['new_marks_project_pillow'],
                                                               data_for_pillow['new_marks_actual_pillow'])
             insertion_point_line = [insertion_point[0] + parameters.OFFSET_PROFILE,
@@ -315,7 +319,7 @@ class CreateProfile:
                                        dx=parameters.OFFSET_TEXT_LINE)
             # проставляем фактические отметки подушки
             insertion_point_ditch_actual = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                            insertion_point[1] + 54.50,
+                                            insertion_point[1] + 37.50,
                                             insertion_point[2]]
             self.profile.iter_text_cad(object_cad=data_for_pillow['new_marks_actual_pillow'],
                                        difference=self.axis_distance_x,
@@ -325,6 +329,38 @@ class CreateProfile:
                                        alignment=1,
                                        text_styles='СПДС',
                                        dx=parameters.OFFSET_TEXT_LINE)
+            # проставляем отклонения по подушке
+            insertion_point_difference = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                          insertion_point[1] + 20.50,
+                                          insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_pillow['mark_difference'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_difference,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles='СПДС',
+                                       dx=parameters.OFFSET_TEXT_LINE)
+            # чертим горизонтальные и вертикальные лини в подвале профиля
+            dd = self.end_profile - self.start_profile
+            self.profile.create_horizontal_line(insertion_point, self.distance_profile, parameters.OFFSET_PROFILE,
+                                                parameters.STEP_HORIZONTAL_PILLOW,
+                                                self.scale_horizontal)
+            self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_PILLOW)
+            # чертим шкалу профиля
+            insertion_point_scale = [insertion_point[0], insertion_point[1] + 97, insertion_point[2]]
+            height_scale = utility.height_scale(data_for_pillow['new_marks_project_pillow'],
+                                                data_for_pillow['new_marks_actual_pillow'])
+
+            self.profile.create_scale(insertion_point=insertion_point_scale,
+                                      height_scale=height_scale,
+                                      height_text=4,
+                                      scale_vertical=self.scale_vertical,
+                                      conditional_horizon=conditional_horizon,
+                                      text_styles='СПДС')
+            self.acadDoc.Utility.Prompt(u'Готово.\n')
+
+
 
         except pythoncom.com_error as f:
             print(f)

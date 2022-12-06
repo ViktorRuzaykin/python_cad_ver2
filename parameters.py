@@ -22,3 +22,5 @@ PATH_FILE_PIPE = 'труба.txt'
 PATH_FILE_FILLING = 'обсыпка.txt'
 
 STEP_HORIZONTAL_DITCH = [12, 17, 17, 17, 12, 22, 17]  # шаг горизонтальных линий подвала разработки
+STEP_HORIZONTAL_PILLOW = [12, 17, 17, 12, 22, 17]  # шаг горизонтальных линий подвала разработки
+DECIMAL_PLACES = 3

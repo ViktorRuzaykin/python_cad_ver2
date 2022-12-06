@@ -131,3 +131,10 @@ def list_point_insert(chk_state_list, insert_point_start, distance_profile):
     if len_state_chk_list == 4:
         _for_append(len_state_chk_list, x)
     return result_point_start
+
+
+def format_decimal(number, decimal_places,):
+    try:
+        return "{:.{}f}".format(float(number), decimal_places)
+    except ValueError:
+        return number

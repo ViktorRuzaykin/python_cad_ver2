@@ -2,7 +2,7 @@ import pythoncom
 import win32com.client
 
 
-acad = win32com.client.Dispatch('AutoCAD.Application')
+acad = win32com.client.GetActiveObject('AutoCAD.Application')
 acadDoc = acad.ActiveDocument
 acadModel = acad.ActiveDocument.ModelSpace
 

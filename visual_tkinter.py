@@ -24,9 +24,11 @@ def stat_draw():
     start_pk = float(''.join(start_pk_en.get().split('+')))
     stop_pk = float(''.join(end_pk_en.get().split('+')))
     print(start_pk, stop_pk)
+    distance_profile = stop_pk - start_pk
     new_profile = create_profile.CreateProfile(data_final=final_data_file,
                                                start_profile=start_pk,
                                                end_profile=stop_pk,
+                                               distance_profile=distance_profile,
                                                scale_vertical=float(scale_vertical_en.get()),
                                                scale_horizontal=float(scale_horizontal_en.get()))
 
@@ -44,6 +46,9 @@ def stat_draw():
                     new_profile.profile_ditch(list_point_insert[0])
                     list_point_insert.pop(0)
                     print(list_point_insert)
+                if chk_state_pillow.get():
+                    new_profile.profile_pillow(list_point_insert[0])
+                    list_point_insert.pop(0)
 
             else:
                 mb.showerror('Ошибка!', 'Не выбраны виды работ!')
@@ -90,14 +95,14 @@ start_pk_lb = Label(tab1, text='Начало ПК:', font=('Arial Bold', 9))
 start_pk_lb.place(x=5, y=30)
 start_pk_en = Entry(tab1, width=13)
 start_pk_en.place(x=85, y=30)
-start_pk_en.insert(0, "0+00.00")
+start_pk_en.insert(0, "2+00.00")
 
 # конечный ПК
 end_pk_lb = Label(tab1, text='Конец ПК:  ', font=('Arial Bold', 9))
 end_pk_lb.place(x=190, y=30)
 end_pk_en = Entry(tab1, width=13)
 end_pk_en.place(x=260, y=30)
-end_pk_en.insert(0, "0+00.00")
+end_pk_en.insert(0, "4+00.00")
 
 # масштаб отрисовки профиля
 scale_lb = Label(tab1, text='Масштаб профиля -', font=('Arial Bold', 9))

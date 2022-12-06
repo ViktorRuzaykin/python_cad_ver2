@@ -32,6 +32,7 @@ class ProfileCad:
 
         for item, increment in zip(object_cad, range(len(difference))):
             text_position = APoint(x + dx, y)
+            item = utility.format_decimal(item, parameters.DECIMAL_PLACES)
             self.add_objects.add_text_autocad(model=self.mSp,
                                               text=utility.transform_to_str(item),
                                               position=text_position,
@@ -41,8 +42,9 @@ class ProfileCad:
                                               alignment=alignment)
             x += difference[increment] * scale_horizontal
         text_position = APoint(x + dx, y)
+        object_num = utility.format_decimal(object_cad[-1], parameters.DECIMAL_PLACES)
         self.add_objects.add_text_autocad(model=self.mSp,
-                                          text=utility.transform_to_str(object_cad[-1]),
+                                          text=utility.transform_to_str(object_num),
                                           position=text_position,
                                           height=height_text,
                                           rotation=parameters.ROTATION_ANGLE_90,

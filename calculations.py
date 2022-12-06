@@ -1,6 +1,8 @@
 import csv
 import random
+
 import parameters
+import utility
 
 
 class Calculations:
@@ -84,16 +86,16 @@ class Calculations:
         for pipe in m_pipe:
             # вычисляем отметку дна траншеи
             m_ditch = pipe - parameters.DIAMETER_PIPE - parameters.HEIGHT_PILLOW if top_pipe else pipe - parameters.HEIGHT_PILLOW
-            ls_ditch.append(round(m_ditch, 2))
+            ls_ditch.append(round(m_ditch, parameters.DECIMAL_PLACES))
             # вычисляем отметку подушки
             m_pillow = pipe - parameters.HEIGHT_PILLOW if top_pipe else pipe
-            ls_pillow.append(round(m_pillow, 2))
+            ls_pillow.append(round(m_pillow, parameters.DECIMAL_PLACES))
             # вычисляем отметку трубы
             new_top_pipe = pipe if top_pipe else pipe + parameters.DIAMETER_PIPE
-            ls_pipe.append(round(new_top_pipe, 2))
+            ls_pipe.append(round(new_top_pipe, parameters.DECIMAL_PLACES))
             # вычисляем отметку присыпки
             m_filling = pipe + parameters.HEIGHT_FILLING if top_pipe else pipe + parameters.DIAMETER_PIPE + parameters.HEIGHT_FILLING
-            ls_filling.append(round(m_filling, 2))
+            ls_filling.append(round(m_filling, parameters.DECIMAL_PLACES))
         return ls_ditch, ls_pillow, ls_pipe, ls_filling
 
     @staticmethod
@@ -118,10 +120,10 @@ class Calculations:
                 m_actual_pillow = m_actual_ditch + parameters.HEIGHT_PILLOW
                 m_actual_pipe = m_actual_pillow + parameters.DIAMETER_PIPE
                 m_actual_filling = filling + random.randint(*parameters.VARIATION_FILLING) / 100
-            ls_actual_ditch.append(round(m_actual_ditch, 2))
-            ls_actual_pillow.append(round(m_actual_pillow, 2))
-            ls_actual_pipe.append(round(m_actual_pipe, 2))
-            ls_actual_filling.append(round(m_actual_filling, 2))
+            ls_actual_ditch.append(round(m_actual_ditch, parameters.DECIMAL_PLACES))
+            ls_actual_pillow.append(round(m_actual_pillow, parameters.DECIMAL_PLACES))
+            ls_actual_pipe.append(round(m_actual_pipe, parameters.DECIMAL_PLACES))
+            ls_actual_filling.append(round(m_actual_filling, parameters.DECIMAL_PLACES))
         return ls_actual_ditch, ls_actual_pillow, ls_actual_pipe, ls_actual_filling
 
     @staticmethod
@@ -171,7 +173,7 @@ class Calculations:
             # new_mark_2 = ls_mark[index_second] - (incline * second_distance)
         else:
             new_mark_1 = ls_mark[index_one]
-        return round(new_mark_1, 2)
+        return round(new_mark_1, parameters.DECIMAL_PLACES)
 
     @staticmethod
     def create_new_list_data(info_start, info_stop, m_start, m_stop, ls_mark):
@@ -198,21 +200,22 @@ class Calculations:
         if info_stop['one_index'] != info_stop['second_index']:
             new_list_data.append(m_stop)
         # print(f'срез - {new_list_data}')
+        print(f'create {new_list_data}')
         return new_list_data
 
     @staticmethod
-    def depth_ditch(marks_ditch, marks_earth):
+    def mark_difference(marks_one, marks_second):
         """
         Расчет глубины разработки
-        :param marks_ditch: фактические отметки траншеи,
-        :param marks_earth: отметки земли
+        :param marks_one: фактические отметки траншеи,
+        :param marks_second: отметки земли
         :return:
         """
-        depth_list = []
-        for m_1, m_2 in zip(marks_ditch, marks_earth):
+        difference_list = []
+        for m_1, m_2 in zip(marks_one, marks_second):
             depth = m_2 - m_1
-            depth_list.append("{:.2f}".format(float(depth)))
-        return depth_list
+            difference_list.append(round(depth, parameters.DECIMAL_PLACES))
+        return difference_list
 
     @staticmethod
     def create_new_list_picketing(info_start, info_stop, pk_int, pk_float, one, second):
@@ -246,6 +249,7 @@ class Calculations:
             return all_distance[info_start['second_index']:info_stop['second_index']] + [second]
         else:
             return [one] + all_distance[info_start['second_index']:info_stop['second_index']] + [second]
+
 
 # calc = Calculations
 """picket_int, picket_float, mark_pipe, mark_earth = calc.reader_base_file()
