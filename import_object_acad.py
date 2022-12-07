@@ -30,7 +30,6 @@ class ImportCadObject:
 
     @staticmethod
     def read_json_file(path_file):
-        # path_file = f'{path_file}.txt'
         with open(path_file, 'r') as infile:
             data_from_autocad = json.load(infile)
         return data_from_autocad['bottom_right_corner_point'], data_from_autocad['dict_line'], data_from_autocad[
@@ -73,7 +72,8 @@ class ImportCadObject:
             self.acadDoc.Utility.Prompt('Импорт завершен\n')
             print(self.info_text)
 
-    def create_basement_header(self, in_point, path_file):
+    def create_basement_header(self, in_point, path_file, text_style):
+
         point, line, text_cad = self.read_json_file(path_file=path_file)
         dx = in_point[0] - point[0]
         dy = in_point[1] - point[1]
@@ -93,7 +93,7 @@ class ImportCadObject:
                 create_new_mtext = self.mSp.AddMText(APoint(point_x, point_y), 0, text_cad[text]['text_string'])
                 create_new_mtext.Height = text_cad[text]['height']
                 create_new_mtext.Rotation = text_cad[text]['rotation']
-                create_new_mtext.StyleName = text_cad[text]['text_styles']
+                create_new_mtext.StyleName = text_style
                 create_new_mtext.Width = text_cad[text]['width']
                 create_new_mtext.AttachmentPoint = text_cad[text]['attachment_point']
                 point_coordinates = APoint(point_x, point_y, 0.00)
@@ -103,7 +103,7 @@ class ImportCadObject:
                 create_new_text = self.mSp.AddText(text_cad[text]['text_string'], APoint(point_x, point_y), 1)
                 create_new_text.Height = text_cad[text]['height']
                 create_new_text.Rotation = text_cad[text]['rotation']
-                create_new_text.StyleName = text_cad[text]['text_styles']
+                create_new_text.StyleName = text_style
         self.acadDoc.Utility.Prompt(u'Подвал создан.\n')
 
     @staticmethod

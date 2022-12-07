@@ -1,3 +1,4 @@
+import sys
 from tkinter import Label, Tk, Entry, Button
 from tkinter import messagebox as mb, IntVar, ttk
 from tkinter.filedialog import askopenfilename
@@ -6,73 +7,97 @@ import pythoncom
 from win32ctypes.pywin32 import pywintypes
 import win32api
 import utility
-from arryautocad import Autocad, APoint
+from arryautocad import Autocad
 from calculations import Calculations
 from create_profile import CreateProfile
 
 final_data_file = None
+pk_int_1 = 0
+pk_float_1 = 0
+pk_int_2 = 0
+pk_float_2 = 0
+
+try:
+    acad = Autocad()
+    a_doc = acad.active_doc
+    list_styles = utility.list_styles(a_doc)
+except pythoncom.com_error:
+    list_styles = []
+print(list_styles)
 
 
 def open_work_file():
     global final_data_file
+    global pk_int_1
+    global pk_float_1
+    global pk_int_2
+    global pk_float_2
     final_data_file = Calculations.reader_final_file(askopenfilename())
-    name_file_final = f'ПК{int(final_data_file["pk_int"][0])}+{"{:.2f}".format(float(final_data_file["pk_float"][0]))} - ПК{int(final_data_file["pk_int"][-1])}+{"{:.2f}".format(float(final_data_file["pk_float"][-1]))}'
+    pk_int_1 = int(final_data_file["pk_int"][0])
+    pk_float_1 = ("{:.2f}".format(float(final_data_file["pk_float"][0])))
+    pk_int_2 = int(final_data_file["pk_int"][-1])
+    pk_float_2 = "{:.2f}".format(float(final_data_file["pk_float"][-1]))
+    name_file_final = f'ПК{pk_int_1}+{pk_float_1} - ПК{pk_int_2}+{pk_float_2}'
+
     open_file_lb.configure(text=name_file_final, background="#47fa41")
 
 
 def stat_draw():
-    try:
-        acad = Autocad()
-        acadDoc = acad.active_doc
-    except pythoncom.com_error as f:
-        mb.showerror(getattr(f, 'strerror'), getattr(f, 'strerror'))
-
-
     start_pk = float(''.join(start_pk_en.get().split('+')))
     stop_pk = float(''.join(end_pk_en.get().split('+')))
-    print(start_pk, stop_pk)
-    distance_profile = stop_pk - start_pk
     new_profile = CreateProfile(data_final=final_data_file,
                                 start_profile=start_pk,
                                 end_profile=stop_pk,
-                                distance_profile=distance_profile,
                                 scale_vertical=float(scale_vertical_en.get()),
-                                scale_horizontal=float(scale_horizontal_en.get()))
+                                scale_horizontal=float(scale_horizontal_en.get()),
+                                text_style=font_combo.get())
 
     chk_state_list = [chk_state_ditch.get(), chk_state_pillow.get(), chk_state_pipe.get(), chk_state_filling.get()]
+    if not final_data_file:
+        return mb.showerror('Ошибка!', 'Не выбран файл для работы!')
+    if start_pk == stop_pk:
+        return mb.showerror('Ошибка!', 'Введенные пикеты не должны быть равны.')
+    if start_pk > stop_pk:
+        return mb.showerror('Ошибка!', 'Конечный пикет больше начального.')
+    if 1 in chk_state_list:
+        try:
+            acad = Autocad()
+        except pythoncom.com_error as f:
+            return mb.showerror(getattr(f, 'strerror'), getattr(f, 'strerror'))
+        chk_state_list = [chk_state_ditch.get(), chk_state_pillow.get(), chk_state_pipe.get(),
+                          chk_state_filling.get()]
+        acad = Autocad()
+        insertion_point = acad.get_point(text='Укажите точку вставки профиля: ')
 
-    if final_data_file:
-        if start_pk != stop_pk or stop_pk > start_pk:
-            if 1 in chk_state_list:
+        list_point_insert = utility.list_point_insert(chk_state_list=chk_state_list,
+                                                      insert_point_start=insertion_point,
+                                                      distance_profile=stop_pk - start_pk)
 
-                chk_state_list = [chk_state_ditch.get(), chk_state_pillow.get(), chk_state_pipe.get(),
-                                  chk_state_filling.get()]
-                insertion_point = acadDoc.Utility.GetPoint(APoint(0, 0), 'Укажите точку вставки профиля: ')
-                list_point_insert = utility.list_point_insert(chk_state_list, insertion_point, 200)
-                # print(list_point_insert)
-                if chk_state_ditch.get():
-                    new_profile.profile_ditch(list_point_insert[0])
-                    list_point_insert.pop(0)
-                    print(list_point_insert)
-                if chk_state_pillow.get():
-                    new_profile.profile_pillow(list_point_insert[0])
-                    list_point_insert.pop(0)
+        if chk_state_ditch.get():
+            new_profile.profile_type_1(insertion_point=list_point_insert[0], key_type='ditch')
+            list_point_insert.pop(0)
 
-            else:
-                mb.showerror('Ошибка!', 'Не выбраны виды работ!')
-                print('error, work')
-        else:
-            mb.showerror('Ошибка!',
-                         'Введенные пикеты не должны быть равны, конечный пикет не должен быть больше начального.')
-            print('error, piket')
+        if chk_state_pillow.get():
+            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pillow')
+            list_point_insert.pop(0)
+
+        if chk_state_pipe.get():
+            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pipe')
+            list_point_insert.pop(0)
+
+        if chk_state_filling.get():
+            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='filling')
+            list_point_insert.pop(0)
     else:
-        mb.showerror('Ошибка!', 'Не выбран файл для работы!')
-        print('error, open file')
+        print('error, work')
+        return mb.showerror('Ошибка!', 'Не выбраны виды работ!')
+
+
 
 
 window = Tk()
 window.title('Ленивчик')
-window.geometry('400x195')
+window.geometry('400x240')
 # path_ico = resource_path('kl.ico')
 window.resizable(width=True, height=True)
 # window.iconbitmap(path_ico)
@@ -149,16 +174,22 @@ chk_state_filling = IntVar()
 chk_state_filling.set(0)
 chk_filling = Checkbutton(tab1, text='Обсыпка', variable=chk_state_filling)
 chk_filling.place(x=170, y=115)
-
+# список шрифтов
+font_lb = Label(tab1, text='Шрифт:', font=('Arial Bold', 9))
+font_lb.place(x=5, y=140)
+font_combo = Combobox(tab1, width=23)
+font_combo['values'] = list_styles
+font_combo.current(0)
+font_combo.place(x=60, y=140)
 # кнопка старта отрисовки профиля
 start_draw = Button(tab1, text='Забабахать разом!', width=40, command=stat_draw)  # command=calc
-start_draw.place(x=30, y=140)
+start_draw.place(x=30, y=170)
 
 # статус выполнения команды
 style = ttk.Style()
 progressbar = Progressbar(tab1, length=380, style='black.Horizontal.TProgressbar', mode='determinate', value=0,
                           maximum=100)
-progressbar.place(x=10, y=170)
+progressbar.place(x=10, y=200)
 progressbar.start()
 
 # ----------------------------------------- Вкладка 'Расчет факта' ------

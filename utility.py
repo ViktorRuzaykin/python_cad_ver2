@@ -138,3 +138,14 @@ def format_decimal(number, decimal_places,):
         return "{:.{}f}".format(float(number), decimal_places)
     except ValueError:
         return number
+
+
+def list_styles(acad_doc):
+    """
+    Определяет список доступны текстовых стилей в текущем чертеже.
+    :return:
+    """
+    try:
+        return [style.name for style in acad_doc.TextStyles if style.name]
+    except:
+        return []

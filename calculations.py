@@ -228,7 +228,10 @@ class Calculations:
         """
         new_int_pk = pk_int[info_start['second_index']:info_stop['second_index']]
         new_int_float = pk_float[info_start['second_index']:info_stop['second_index']]
-        return [one // 100] + new_int_pk + [second // 100], [one % 100] + new_int_float + [second % 100]
+        if info_start['one_index'] == info_start['second_index']:
+            return new_int_pk + [second // 100], new_int_float + [second % 100]
+        else:
+            return [one // 100] + new_int_pk + [second // 100], [one % 100] + new_int_float + [second % 100]
 
     @staticmethod
     def create_new_list_distance(info_start, info_stop, all_distance, one, second):

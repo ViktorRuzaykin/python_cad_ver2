@@ -51,15 +51,16 @@ class ProfileCad:
                                           alignment=alignment)
         self.acadDoc.Utility.Prompt(u'Итерация завершена.\n')  # для теста
 
-    def create_header(self, insertion_point, path_file):
+    def create_header(self, insertion_point, path_file, text_style):
         """
         Создает шапку подвала
+        :param text_style:
         :param path_file:
         :param insertion_point: точка вставки подвала
         :return:
         """
         time.sleep(0.1)
-        self.create_basement_header.create_basement_header(insertion_point, path_file)
+        self.create_basement_header.create_basement_header(insertion_point, path_file, text_style)
 
     def create_line_profile(self, insertion_point, difference, mark, scale_vertical, scale_horizontal, line_type,
                             conditional_horizon, vertical_line=True):
@@ -109,15 +110,16 @@ class ProfileCad:
         :return:
         """
         point_1_x, point_1_y = insertion_point[0], insertion_point[1]
-        point_2_x = insertion_point[0] + distances + dx
+        point_2_x = insertion_point[0] + distances * scale_horizontal + dx
         point_2_y = insertion_point[1]
         self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
+        time.sleep(0.2)
         for step_in in step:
-            point_1_y += step_in * scale_horizontal
-            point_2_y += step_in * scale_horizontal
+            point_1_y += step_in
+            point_2_y += step_in
             self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
 
-    def create_vertical_line(self, insertion_point, distances, step):
+    def create_vertical_line(self, insertion_point, distances, step, scale_horizontal):
         """
         Создает вертикальные линии в подвале профиля.
         :return:
@@ -125,9 +127,10 @@ class ProfileCad:
         point_1_x, point_1_y = insertion_point[0] + 8.50, insertion_point[1]
         point_2_x, point_2_y = insertion_point[0] + 8.50, insertion_point[1] + sum(step)
         self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
+        time.sleep(0.2)
         for value_dist in distances:
-            point_1_x += value_dist
-            point_2_x += value_dist
+            point_1_x += value_dist * scale_horizontal
+            point_2_x += value_dist * scale_horizontal
             self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
 
     def create_scale(self, insertion_point, height_scale, height_text, scale_vertical, conditional_horizon,
@@ -162,12 +165,3 @@ class ProfileCad:
         self.mSp.AddLine(APoint(point_1_x - scale_width, insertion_point[1]),
                          APoint(point_1_x - scale_width, point_1_y - scale_vertical))
 
-    def list_styles(self):
-        """
-        Определяет список доступны текстовых стилей в текущем чертеже.
-        :return:
-        """
-        try:
-            return [style.name for style in self.mSp.TextStyles]
-        except:
-            pass

@@ -1,8 +1,12 @@
-SCALE_WIDTH = 1 / 5  # соотношение ширины шкалы, ширина к высоте
+parameters = {}
+
+
+
+SCALE_WIDTH = 1 / 7  # соотношение ширины шкалы, ширина к высоте
 CONDITIONAL_HORIZON = 5  # значение для определения условного горизонта
 OFFSET_TEXT_SCALE = 4  # отступ текста от шкалы профиля
 ROTATION_ANGLE_90 = 1.57079632679  # угол 90 градусов в радианах
-OFFSET_TEXT_LINE = -1.4  # отступ текста от линии в подвале
+OFFSET_TEXT_LINE = -1.1  # отступ текста от линии в подвале
 OFFSET_PROFILE = 8.5  # отступ основного профиля от шапки подвала
 OFFSET_NEW_PROFILE = 40
 WIDTH_BASEMENT = 100
@@ -16,6 +20,12 @@ HEIGHT_FILLING = 0.30  # высота присыпки
 NAME_COLUMN = ('пк', 'плюс', 'H трубы', 'Н земли', 'Н транш', 'Н ф.транш', 'Н подуш', 'Н ф.подуш', 'Н ф.трубы',
                'Н обсып', 'Н ф.обсып')
 
+PATH_FILE = {
+    'ditch': 'траншея.txt',
+    'pillow': 'подушка.txt',
+    'pipe': 'труба.txt',
+    'filling': 'обсыпка.txt',
+}
 PATH_FILE_DITCH = 'траншея.txt'
 PATH_FILE_PILLOW = 'подушка.txt'
 PATH_FILE_PIPE = 'труба.txt'
@@ -35,7 +45,6 @@ LEVEL_DITCH_ACTUAL = 54.50
 LEVEL_DITCH_EARTH = 37.50
 LEVEL_DITCH_DEPTH = 20.50
 
-
 L1 = 88.50
 L2 = 69.00
 L3 = 37.50
@@ -44,3 +53,13 @@ LEVEL_PILLOW_PROJECT, LEVEL_PIPE_PROJECT, LEVEL_FILLING_PROJECT = L1, L1, L1
 LEVEL_PILLOW_PK, LEVEL_PIPE_PK, LEVEL_FILLING_PK = L2, L2, L2
 LEVEL_PILLOW_ACTUAL, LEVEL_PIPE_ACTUAL, LEVEL_FILLING_ACTUAL = L3, L3, L3
 LEVEL_PILLOW_DIFF, LEVEL_PIPE_DIFF, LEVEL_FILLING_DIFF = L4, L4, L4
+
+KEY_TYPE = {
+    'ditch': '"Траншея"',
+    'pillow': '"Подушка"',
+    'pipe': '"Укладка"',
+    'filling': '"Обсыпка"'
+}
+
+
+

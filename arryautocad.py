@@ -42,6 +42,9 @@ class Autocad:
         selection.SelectOnScreen()
         return selection
 
+    def get_point(self, text='Укажите точку вставки:'):
+        get_point = self.active_doc.Utility.GetPoint(APoint(0, 0), text)
+        return get_point
 
 class APoint:
     def __new__(cls, x, y, z=0):
