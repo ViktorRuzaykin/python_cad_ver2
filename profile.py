@@ -31,7 +31,7 @@ class ProfileCad:
 
         for item, increment in zip(object_cad, range(len(difference))):
             text_position = APoint(x + dx, y)
-            item = utility.format_decimal(item, parameters.DECIMAL_PLACES)
+            # item = utility.format_decimal(item, parameters.DECIMAL_PLACES)
             self.add_objects.add_text_autocad(model=self.mSp,
                                               text=utility.transform_to_str(item),
                                               position=text_position,

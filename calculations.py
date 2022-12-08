@@ -1,6 +1,8 @@
 import csv
 import random
+
 import parameters
+import utility
 
 
 class Calculations:
@@ -201,17 +203,24 @@ class Calculations:
         return new_list_data
 
     @staticmethod
-    def mark_difference(marks_one, marks_second):
+    def mark_difference(marks_one, marks_second, difference_type):
         """
-        Расчет глубины разработки
+        Расчет разницы
+        :param difference_type:
         :param marks_one: фактические отметки траншеи,
         :param marks_second: отметки земли
         :return:
         """
         difference_list = []
         for m_1, m_2 in zip(marks_one, marks_second):
-            depth = m_2 - m_1
-            difference_list.append(round(depth, parameters.DECIMAL_PLACES))
+            depth = (m_2 - m_1)
+            if difference_type == 'см':
+                depth = utility.format_decimal(depth * parameters.DIFFERENCE_TYPE[difference_type], 0)
+            if difference_type == 'мм':
+                depth = utility.format_decimal(depth * parameters.DIFFERENCE_TYPE[difference_type], 0)
+            if difference_type == 'м':
+                depth = round(depth, parameters.DECIMAL_PLACES)
+            difference_list.append(depth)
         return difference_list
 
     @staticmethod

@@ -74,19 +74,19 @@ def stat_draw():
                                                       distance_profile=stop_pk - start_pk)
 
         if chk_state_ditch.get():
-            new_profile.profile_type_1(insertion_point=list_point_insert[0], key_type='ditch')
+            new_profile.profile_type_1(insertion_point=list_point_insert[0], key_type='ditch', difference_type='м')
             list_point_insert.pop(0)
 
         if chk_state_pillow.get():
-            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pillow')
+            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pillow', difference_type='см')
             list_point_insert.pop(0)
 
         if chk_state_pipe.get():
-            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pipe')
+            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pipe', difference_type='мм')
             list_point_insert.pop(0)
 
         if chk_state_filling.get():
-            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='filling')
+            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='filling', difference_type='см')
             list_point_insert.pop(0)
     else:
         print('error, work')
@@ -135,7 +135,7 @@ end_pk_lb = Label(tab1, text='Конец ПК:  ', font=('Arial Bold', 9))
 end_pk_lb.place(x=190, y=30)
 end_pk_en = Entry(tab1, width=13)
 end_pk_en.place(x=260, y=30)
-end_pk_en.insert(0, "4+00.00")
+end_pk_en.insert(0, "3+00.00")
 
 # масштаб отрисовки профиля
 scale_lb = Label(tab1, text='Масштаб профиля -', font=('Arial Bold', 9))
@@ -179,7 +179,7 @@ font_lb = Label(tab1, text='Шрифт:', font=('Arial Bold', 9))
 font_lb.place(x=5, y=140)
 font_combo = Combobox(tab1, width=23)
 font_combo['values'] = list_styles
-font_combo.current(0)
+font_combo.set('СПДС')
 font_combo.place(x=60, y=140)
 # кнопка старта отрисовки профиля
 start_draw = Button(tab1, text='Забабахать разом!', width=40, command=stat_draw)  # command=calc

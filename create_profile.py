@@ -53,7 +53,7 @@ class CreateProfile:
 
             self.list_picketing = utility.transform_pk_type_one(self.new_pk_int, self.new_pk_float)
 
-    def _data_for_profile_type_1(self):
+    def _data_for_profile_type_1(self, difference_type):
         # получаем новый список отметок по траншеи проект
         mark_one_project_ditch = self.calculations.interpolation_mark(self.position_picketing_one,
                                                                       self.data_final['project_ditch'])
@@ -89,7 +89,7 @@ class CreateProfile:
                                                                         mark_second_earth,
                                                                         self.data_final['mark_earth'])
         # получаем список глубин траншеи
-        list_depth = self.calculations.mark_difference(new_marks_actual_ditch, new_marks_actual_earth)
+        list_depth = self.calculations.mark_difference(new_marks_actual_ditch, new_marks_actual_earth, difference_type)
         data_ditch = {'new_marks_project': new_marks_project_ditch,
                       'new_marks_actual_1': new_marks_actual_ditch,
                       'new_marks_actual_2': new_marks_actual_earth,
@@ -97,8 +97,8 @@ class CreateProfile:
                       }
         return data_ditch
 
-    def profile_type_1(self, insertion_point, key_type):
-        data_for_type_1 = self._data_for_profile_type_1()
+    def profile_type_1(self, insertion_point, key_type, difference_type):
+        data_for_type_1 = self._data_for_profile_type_1(difference_type)
         try:
             time.sleep(0.1)
             self.profile.create_header(insertion_point, parameters.PATH_FILE[key_type], self.text_style)  # чертим шапку подвала
@@ -227,7 +227,7 @@ class CreateProfile:
             # self.profile_ditch(insertion_point)
             mb.showerror('Внутренняя ошибка', 'Ошибка отрисовки профиля траншеи')
 
-    def _data_for_profile_type_2(self, key_type):
+    def _data_for_profile_type_2(self, key_type, difference_type):
         # получаем новый список отметок по подушке проект
         mark_one_project = self.calculations.interpolation_mark(self.position_picketing_one,
                                                                 self.data_final[f'project_{key_type}'])
@@ -251,7 +251,7 @@ class CreateProfile:
                                                               mark_one_actual,
                                                               mark_second_actual,
                                                               self.data_final[f'actual_{key_type}'])
-        mark_difference = self.calculations.mark_difference(marks_project, marks_actual)
+        mark_difference = self.calculations.mark_difference(marks_project, marks_actual, difference_type)
 
         data_type_2 = {
             'marks_project': marks_project,
@@ -260,8 +260,8 @@ class CreateProfile:
         }
         return data_type_2
 
-    def profile_type_2(self, insertion_point, key_type):
-        data_for_type_2 = self._data_for_profile_type_2(key_type=key_type)
+    def profile_type_2(self, insertion_point, key_type, difference_type):
+        data_for_type_2 = self._data_for_profile_type_2(key_type=key_type, difference_type=difference_type)
         try:
 
             self.profile.create_header(insertion_point, parameters.PATH_FILE[key_type], self.text_style)  # чертим шапку подвала
