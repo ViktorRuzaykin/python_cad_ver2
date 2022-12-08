@@ -337,7 +337,8 @@ class CreateProfile:
                                        scale_horizontal=self.scale_horizontal,
                                        alignment=1,
                                        text_styles=self.text_style,
-                                       dx=parameters.OFFSET_TEXT_LINE)
+                                       dx=parameters.OFFSET_TEXT_LINE,
+                                       difference_type=difference_type)
             # чертим горизонтальные и вертикальные лини в подвале профиля
             self.profile.create_horizontal_line(insertion_point, self.distance_profile, parameters.OFFSET_PROFILE,
                                                 parameters.STEP_HORIZONTAL_PILLOW,

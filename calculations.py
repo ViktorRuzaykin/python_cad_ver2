@@ -2,11 +2,9 @@ import csv
 import random
 
 import parameters
-import utility
 
 
 class Calculations:
-
     @staticmethod
     def reader_base_file(base_file):
         """
@@ -214,12 +212,6 @@ class Calculations:
         difference_list = []
         for m_1, m_2 in zip(marks_one, marks_second):
             depth = (m_2 - m_1)
-            if difference_type == 'см':
-                depth = utility.format_decimal(depth * parameters.DIFFERENCE_TYPE[difference_type], 0)
-            if difference_type == 'мм':
-                depth = utility.format_decimal(depth * parameters.DIFFERENCE_TYPE[difference_type], 0)
-            if difference_type == 'м':
-                depth = round(depth, parameters.DECIMAL_PLACES)
             difference_list.append(depth)
         return difference_list
 

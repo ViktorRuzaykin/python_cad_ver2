@@ -133,9 +133,12 @@ def list_point_insert(chk_state_list, insert_point_start, distance_profile):
     return result_point_start
 
 
-def format_decimal(number, decimal_places,):
+def format_decimal(number, decimal_places, difference_type):
     try:
-        return "{:.{}f}".format(float(number), decimal_places)
+        if difference_type == 'м':
+            return "{:.{}f}".format(float(number), decimal_places)
+        if difference_type == 'см' or difference_type == 'мм':
+            return "{:.{}f}".format(float(number * parameters.DIFFERENCE_TYPE[difference_type]), 0)
     except ValueError:
         return number
 

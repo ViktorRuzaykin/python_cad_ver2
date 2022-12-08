@@ -14,9 +14,10 @@ class ProfileCad:
         self.acadDoc = acadDoc
 
     def iter_text_cad(self, object_cad, difference, point_start, height_text, scale_horizontal, alignment, dx=0,
-                      text_styles='Standard'):
+                      text_styles='Standard', difference_type='м'):
         """
         Расставляем текстовые объекты через заданное расстояние.
+        :param difference_type:
         :param alignment:
         :param scale_horizontal:
         :param text_styles:
@@ -31,7 +32,7 @@ class ProfileCad:
 
         for item, increment in zip(object_cad, range(len(difference))):
             text_position = APoint(x + dx, y)
-            # item = utility.format_decimal(item, parameters.DECIMAL_PLACES)
+            item = utility.format_decimal(item, parameters.DECIMAL_PLACES, difference_type)
             self.add_objects.add_text_autocad(model=self.mSp,
                                               text=utility.transform_to_str(item),
                                               position=text_position,
@@ -41,7 +42,7 @@ class ProfileCad:
                                               alignment=alignment)
             x += difference[increment] * scale_horizontal
         text_position = APoint(x + dx, y)
-        object_num = utility.format_decimal(object_cad[-1], parameters.DECIMAL_PLACES)
+        object_num = utility.format_decimal(object_cad[-1], parameters.DECIMAL_PLACES, difference_type)
         self.add_objects.add_text_autocad(model=self.mSp,
                                           text=utility.transform_to_str(object_num),
                                           position=text_position,
