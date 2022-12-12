@@ -13,7 +13,8 @@ class AddObject:
             new_text.Rotation = rotation
             new_text.StyleName = text_styles
             new_text.Alignment = alignment
-            new_text.TextAlignmentPoint = position
+            if alignment != 0:
+                new_text.TextAlignmentPoint = position
         except AttributeError:
             new_text = model.AddText(text, position, height)
             new_text.Rotation = rotation

@@ -55,7 +55,7 @@ class CreateProfile:
 
             self.list_picketing = utility.transform_pk_type_one(self.new_pk_int, self.new_pk_float)
 
-    def _data_for_profile_type_1(self, difference_type):
+    def _data_for_profile_type_1(self):
         # получаем новый список отметок по траншеи проект
         mark_one_project_ditch = self.calculations.interpolation_mark(self.position_picketing_one,
                                                                       self.data_final['project_ditch'])
@@ -91,147 +91,177 @@ class CreateProfile:
                                                                         mark_second_earth,
                                                                         self.data_final['mark_earth'])
         # получаем список глубин траншеи
-        list_depth = self.calculations.mark_difference(new_marks_actual_ditch, new_marks_actual_earth, difference_type)
+        list_depth = self.calculations.mark_difference(new_marks_actual_ditch, new_marks_actual_earth)
+        # получаем отклонений
+        list_difference = self.calculations.mark_difference(new_marks_project_ditch, new_marks_actual_ditch)
+
         data_ditch = {'new_marks_project': new_marks_project_ditch,
                       'new_marks_actual_1': new_marks_actual_ditch,
                       'new_marks_actual_2': new_marks_actual_earth,
                       'list_depth': list_depth,
+                      'list_difference': list_difference,
                       }
         return data_ditch
 
-    def profile_type_1(self, insertion_point, key_type, difference_type):
-        data_for_type_1 = self._data_for_profile_type_1(difference_type)
-
+    def profile_type_1(self, insertion_point, key_type):
+        data_for_type_1 = self._data_for_profile_type_1()
         time.sleep(0.03)
-        self.profile.create_header(insertion_point, parameters.PATH_FILE[key_type],
-                                   self.text_style)  # чертим шапку подвала
-        # чертим линию профиля
-        conditional_horizon = utility.conditional_horizon(data_for_type_1['new_marks_project'],
-                                                          data_for_type_1['new_marks_actual_2'])
-        insertion_point_ditch = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                 insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH),
-                                 insertion_point[2]]
+        try:
+            self.profile.create_header(insertion_point, parameters.PATH_FILE[key_type],
+                                       self.text_style)  # чертим шапку подвала
+            # чертим линию профиля
+            conditional_horizon = utility.conditional_horizon(data_for_type_1['new_marks_project'],
+                                                              data_for_type_1['new_marks_actual_2'])
 
-        self.profile.create_line_profile(insertion_point=insertion_point_ditch,
-                                         difference=self.axis_distance_x,
-                                         mark=data_for_type_1['new_marks_project'],
-                                         scale_vertical=self.scale_vertical,
-                                         scale_horizontal=self.scale_horizontal,
-                                         line_type='CONTI',
-                                         conditional_horizon=conditional_horizon,
-                                         vertical_line=False)
-
-        self.profile.create_line_profile(insertion_point=insertion_point_ditch,
-                                         difference=self.axis_distance_x,
-                                         mark=data_for_type_1['new_marks_actual_2'],
-                                         scale_vertical=self.scale_vertical,
-                                         scale_horizontal=self.scale_horizontal,
-                                         line_type='CONTI',
-                                         conditional_horizon=conditional_horizon,
-                                         vertical_line=True)
-
-        self.profile.create_line_profile(insertion_point=insertion_point_ditch,
-                                         difference=self.axis_distance_x,
-                                         mark=data_for_type_1['new_marks_actual_1'],
-                                         scale_vertical=self.scale_vertical,
-                                         scale_horizontal=self.scale_horizontal,
-                                         line_type='DASHED',
-                                         conditional_horizon=conditional_horizon,
-                                         vertical_line=False)
-
-        # проставляем проектные отметки траншеи
-        insertion_point_mark_1 = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                  insertion_point[1] + parameters.LEVEL_DITCH_PROJECT,
-                                  insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=data_for_type_1['new_marks_project'],
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_mark_1,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
-
-        # проставляем пикетаж
-        insertion_point_picketing = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                     insertion_point[1] + parameters.LEVEL_DITCH_PK,
+            con_hor_text = [insertion_point[0] - 79,
+                            insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH) + 5,
+                            insertion_point[2]]
+            conditional_horizon_text = f'Условный горизонт {"{:.2f}".format(float(conditional_horizon))}м'
+            self.profile.conditional_horizon_text(text=conditional_horizon_text,
+                                                  text_position=con_hor_text,
+                                                  height_text=4,
+                                                  rotation=0,
+                                                  text_styles=self.text_style,
+                                                  alignment=0)
+            insertion_point_ditch = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                     insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH),
                                      insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=self.list_picketing,
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_picketing,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
 
-        # проставляем фактические отметки траншеи
-        insertion_point_ditch_actual = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                        insertion_point[1] + parameters.LEVEL_DITCH_ACTUAL,
-                                        insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=data_for_type_1['new_marks_actual_1'],
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_ditch_actual,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
+            self.profile.create_line_profile(insertion_point=insertion_point_ditch,
+                                             difference=self.axis_distance_x,
+                                             mark=data_for_type_1['new_marks_project'],
+                                             scale_vertical=self.scale_vertical,
+                                             scale_horizontal=self.scale_horizontal,
+                                             line_type='CONTI',
+                                             conditional_horizon=conditional_horizon,
+                                             vertical_line=False)
 
-        # проставляем отметки земли
-        insertion_point_earth = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                 insertion_point[1] + parameters.LEVEL_DITCH_EARTH,
-                                 insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=data_for_type_1['new_marks_actual_2'],
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_earth,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
+            self.profile.create_line_profile(insertion_point=insertion_point_ditch,
+                                             difference=self.axis_distance_x,
+                                             mark=data_for_type_1['new_marks_actual_2'],
+                                             scale_vertical=self.scale_vertical,
+                                             scale_horizontal=self.scale_horizontal,
+                                             line_type='CONTI',
+                                             conditional_horizon=conditional_horizon,
+                                             vertical_line=True)
 
-        # проставляем глубину разработки
-        insertion_point_depth = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                 insertion_point[1] + parameters.LEVEL_DITCH_DEPTH,
-                                 insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=data_for_type_1['list_depth'],
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_depth,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
+            self.profile.create_line_profile(insertion_point=insertion_point_ditch,
+                                             difference=self.axis_distance_x,
+                                             mark=data_for_type_1['new_marks_actual_1'],
+                                             scale_vertical=self.scale_vertical,
+                                             scale_horizontal=self.scale_horizontal,
+                                             line_type='DASHED',
+                                             conditional_horizon=conditional_horizon,
+                                             vertical_line=False)
 
-        # чертим горизонтальные и вертикальные лини в подвале профиля
+            # проставляем проектные отметки траншеи
+            insertion_point_mark_1 = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                      insertion_point[1] + parameters.LEVEL_DITCH_PROJECT,
+                                      insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_type_1['new_marks_project'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_mark_1,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
 
-        self.profile.create_horizontal_line(insertion_point, self.distance_profile, parameters.OFFSET_PROFILE,
-                                            parameters.STEP_HORIZONTAL_DITCH,
-                                            self.scale_horizontal)
-        self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_DITCH,
-                                          self.scale_horizontal)
-        # чертим шкалу профиля
-        insertion_point_scale = [insertion_point[0], insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH),
-                                 insertion_point[2]]
-        height_scale = utility.height_scale(data_for_type_1['new_marks_project'],
-                                            data_for_type_1['new_marks_actual_2'])
+            # проставляем пикетаж
+            insertion_point_picketing = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                         insertion_point[1] + parameters.LEVEL_DITCH_PK,
+                                         insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=self.list_picketing,
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_picketing,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
 
-        self.profile.create_scale(insertion_point=insertion_point_scale,
-                                  height_scale=height_scale,
-                                  height_text=4,
-                                  scale_vertical=self.scale_vertical,
-                                  conditional_horizon=conditional_horizon,
-                                  text_styles=self.text_style)
-        self.acadDoc.Utility.Prompt(f'Готово - {parameters.KEY_TYPE[key_type]}.\n')
+            # проставляем фактические отметки траншеи
+            insertion_point_ditch_actual = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                            insertion_point[1] + parameters.LEVEL_DITCH_ACTUAL,
+                                            insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_type_1['new_marks_actual_1'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_ditch_actual,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
 
-    """        except pythoncom.com_error as f:
-        print(f)
-        print('error ditch')
-        # self.profile_ditch(insertion_point)
-        mb.showerror('Внутренняя ошибка', 'Ошибка отрисовки профиля траншеи')"""
+            # проставляем отметки земли
+            insertion_point_earth = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                     insertion_point[1] + parameters.LEVEL_DITCH_EARTH,
+                                     insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_type_1['new_marks_actual_2'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_earth,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
 
-    def _data_for_profile_type_2(self, key_type, difference_type):
+            # проставляем глубину разработки
+            insertion_point_depth = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                     insertion_point[1] + parameters.LEVEL_DITCH_DEPTH,
+                                     insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_type_1['list_depth'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_depth,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
+
+            # проставляем отклонения
+            insertion_point_depth = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                     insertion_point[1] + parameters.LEVEL_DITCH_DIFF,
+                                     insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_type_1['list_difference'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_depth,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE,
+                                       difference_type='см')
+
+            # чертим горизонтальные и вертикальные лини в подвале профиля
+
+            self.profile.create_horizontal_line(insertion_point, self.distance_profile, parameters.OFFSET_PROFILE,
+                                                parameters.STEP_HORIZONTAL_DITCH,
+                                                self.scale_horizontal)
+            self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_DITCH,
+                                              self.scale_horizontal)
+            # чертим шкалу профиля
+
+            """insertion_point_scale = [insertion_point[0], insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH),
+                                     insertion_point[2]]
+            height_scale = utility.height_scale(data_for_type_1['new_marks_project'],
+                                                data_for_type_1['new_marks_actual_2'])
+
+            self.profile.create_scale(insertion_point=insertion_point_scale,
+                                      height_scale=height_scale,
+                                      height_text=4,
+                                      scale_vertical=self.scale_vertical,
+                                      conditional_horizon=conditional_horizon,
+                                      text_styles=self.text_style)"""
+            self.acadDoc.Utility.Prompt(f'Готово - {parameters.KEY_TYPE[key_type]}.\n')
+
+        except pythoncom.com_error as f:
+            print(f)
+            print('error ditch')
+            # self.profile_ditch(insertion_point)
+            mb.showerror('Внутренняя ошибка', f'Ошибка отрисовки профиля - {parameters.KEY_TYPE[key_type]}')
+
+    def _data_for_profile_type_2(self, key_type):
         # получаем новый список отметок по подушке проект
         mark_one_project = self.calculations.interpolation_mark(self.position_picketing_one,
                                                                 self.data_final[f'project_{key_type}'])
@@ -255,7 +285,7 @@ class CreateProfile:
                                                               mark_one_actual,
                                                               mark_second_actual,
                                                               self.data_final[f'actual_{key_type}'])
-        mark_difference = self.calculations.mark_difference(marks_project, marks_actual, difference_type)
+        mark_difference = self.calculations.mark_difference(marks_project, marks_actual)
 
         data_type_2 = {
             'marks_project': marks_project,
@@ -265,107 +295,118 @@ class CreateProfile:
         return data_type_2
 
     def profile_type_2(self, insertion_point, key_type, difference_type):
-        data_for_type_2 = self._data_for_profile_type_2(key_type=key_type, difference_type=difference_type)
+        data_for_type_2 = self._data_for_profile_type_2(key_type=key_type)
+        time.sleep(0.02)
+        try:
+            self.profile.create_header(insertion_point, parameters.PATH_FILE[key_type],
+                                       self.text_style)  # чертим шапку подвала
+            conditional_horizon = utility.conditional_horizon(data_for_type_2['marks_project'],
+                                                              data_for_type_2['marks_actual'])
+            con_hor_text = [insertion_point[0] - 79,
+                            insertion_point[1] + sum(parameters.STEP_HORIZONTAL_PILLOW) + 5,
+                            insertion_point[2]]
+            conditional_horizon_text = f'Условный горизонт {"{:.2f}".format(float(conditional_horizon))}м'
+            self.profile.conditional_horizon_text(text=conditional_horizon_text,
+                                                  text_position=con_hor_text,
+                                                  height_text=4,
+                                                  rotation=0,
+                                                  text_styles=self.text_style,
+                                                  alignment=0)
 
-        self.profile.create_header(insertion_point, parameters.PATH_FILE[key_type],
-                                   self.text_style)  # чертим шапку подвала
-        conditional_horizon = utility.conditional_horizon(data_for_type_2['marks_project'],
-                                                          data_for_type_2['marks_actual'])
-        insertion_point_line = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                insertion_point[1] + sum(parameters.STEP_HORIZONTAL_PILLOW),
-                                insertion_point[2]]
-        # проектная линия профиля
-        self.profile.create_line_profile(insertion_point=insertion_point_line,
-                                         difference=self.axis_distance_x,
-                                         mark=data_for_type_2['marks_project'],
-                                         scale_vertical=self.scale_vertical,
-                                         scale_horizontal=self.scale_horizontal,
-                                         line_type='CONTI',
-                                         conditional_horizon=conditional_horizon,
-                                         vertical_line=True)
-        # фактическая линия профиля
-        self.profile.create_line_profile(insertion_point=insertion_point_line,
-                                         difference=self.axis_distance_x,
-                                         mark=data_for_type_2['marks_actual'],
-                                         scale_vertical=self.scale_vertical,
-                                         scale_horizontal=self.scale_horizontal,
-                                         line_type='DASHED',
-                                         conditional_horizon=conditional_horizon,
-                                         vertical_line=False)
+            # проектная линия профиля
+            insertion_point_line = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                    insertion_point[1] + sum(parameters.STEP_HORIZONTAL_PILLOW),
+                                    insertion_point[2]]
+            self.profile.create_line_profile(insertion_point=insertion_point_line,
+                                             difference=self.axis_distance_x,
+                                             mark=data_for_type_2['marks_project'],
+                                             scale_vertical=self.scale_vertical,
+                                             scale_horizontal=self.scale_horizontal,
+                                             line_type='CONTI',
+                                             conditional_horizon=conditional_horizon,
+                                             vertical_line=True)
+            # фактическая линия профиля
+            self.profile.create_line_profile(insertion_point=insertion_point_line,
+                                             difference=self.axis_distance_x,
+                                             mark=data_for_type_2['marks_actual'],
+                                             scale_vertical=self.scale_vertical,
+                                             scale_horizontal=self.scale_horizontal,
+                                             line_type='DASHED',
+                                             conditional_horizon=conditional_horizon,
+                                             vertical_line=False)
 
-        # проставляем проектные отметки
-        insertion_point_mark_1 = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                  insertion_point[1] + parameters.LEVEL_PILLOW_PROJECT,
-                                  insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=data_for_type_2['marks_project'],
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_mark_1,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
-
-        # проставляем пикетаж
-        insertion_point_picketing = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                     insertion_point[1] + parameters.LEVEL_PILLOW_PK,
-                                     insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=self.list_picketing,
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_picketing,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
-        # проставляем фактические отметки
-        insertion_point_ditch_actual = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                        insertion_point[1] + parameters.LEVEL_PILLOW_ACTUAL,
-                                        insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=data_for_type_2['marks_actual'],
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_ditch_actual,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE)
-        # проставляем отклонения
-        insertion_point_difference = [insertion_point[0] + parameters.OFFSET_PROFILE,
-                                      insertion_point[1] + parameters.LEVEL_PILLOW_DIFF,
+            # проставляем проектные отметки
+            insertion_point_mark_1 = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                      insertion_point[1] + parameters.LEVEL_PILLOW_PROJECT,
                                       insertion_point[2]]
-        self.profile.iter_text_cad(object_cad=data_for_type_2['mark_difference'],
-                                   difference=self.axis_distance_x,
-                                   point_start=insertion_point_difference,
-                                   height_text=4,
-                                   scale_horizontal=self.scale_horizontal,
-                                   alignment=1,
-                                   text_styles=self.text_style,
-                                   dx=parameters.OFFSET_TEXT_LINE,
-                                   difference_type=difference_type)
-        # чертим горизонтальные и вертикальные лини в подвале профиля
-        self.profile.create_horizontal_line(insertion_point, self.distance_profile, parameters.OFFSET_PROFILE,
-                                            parameters.STEP_HORIZONTAL_PILLOW,
-                                            self.scale_horizontal)
-        self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_PILLOW,
-                                          self.scale_horizontal)
-        # чертим шкалу профиля
-        insertion_point_scale = [insertion_point[0], insertion_point[1] + sum(parameters.STEP_HORIZONTAL_PILLOW),
-                                 insertion_point[2]]
-        height_scale = utility.height_scale(data_for_type_2['marks_project'],
-                                            data_for_type_2['marks_actual'])
+            self.profile.iter_text_cad(object_cad=data_for_type_2['marks_project'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_mark_1,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
 
-        self.profile.create_scale(insertion_point=insertion_point_scale,
-                                  height_scale=height_scale,
-                                  height_text=4,
-                                  scale_vertical=self.scale_vertical,
-                                  conditional_horizon=conditional_horizon,
-                                  text_styles=self.text_style)
-        self.acadDoc.Utility.Prompt(f'Готово - {parameters.KEY_TYPE[key_type]}.\n')
+            # проставляем пикетаж
+            insertion_point_picketing = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                         insertion_point[1] + parameters.LEVEL_PILLOW_PK,
+                                         insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=self.list_picketing,
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_picketing,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
+            # проставляем фактические отметки
+            insertion_point_ditch_actual = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                            insertion_point[1] + parameters.LEVEL_PILLOW_ACTUAL,
+                                            insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_type_2['marks_actual'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_ditch_actual,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE)
+            # проставляем отклонения
+            insertion_point_difference = [insertion_point[0] + parameters.OFFSET_PROFILE,
+                                          insertion_point[1] + parameters.LEVEL_PILLOW_DIFF,
+                                          insertion_point[2]]
+            self.profile.iter_text_cad(object_cad=data_for_type_2['mark_difference'],
+                                       difference=self.axis_distance_x,
+                                       point_start=insertion_point_difference,
+                                       height_text=4,
+                                       scale_horizontal=self.scale_horizontal,
+                                       alignment=1,
+                                       text_styles=self.text_style,
+                                       dx=parameters.OFFSET_TEXT_LINE,
+                                       difference_type=difference_type)
+            # чертим горизонтальные и вертикальные лини в подвале профиля
+            self.profile.create_horizontal_line(insertion_point, self.distance_profile, parameters.OFFSET_PROFILE,
+                                                parameters.STEP_HORIZONTAL_PILLOW,
+                                                self.scale_horizontal)
+            self.profile.create_vertical_line(insertion_point, self.axis_distance_x, parameters.STEP_HORIZONTAL_PILLOW,
+                                              self.scale_horizontal)
+            # чертим шкалу профиля
+            """insertion_point_scale = [insertion_point[0], insertion_point[1] + sum(parameters.STEP_HORIZONTAL_PILLOW),
+                                     insertion_point[2]]
+            height_scale = utility.height_scale(data_for_type_2['marks_project'],
+                                                data_for_type_2['marks_actual'])
+    
+            self.profile.create_scale(insertion_point=insertion_point_scale,
+                                      height_scale=height_scale,
+                                      height_text=4,
+                                      scale_vertical=self.scale_vertical,
+                                      conditional_horizon=conditional_horizon,
+                                      text_styles=self.text_style)"""
 
-
-"""        except pythoncom.com_error as f:
-        print(f)
-        print(f'error {parameters.KEY_TYPE[key_type]}')
-        # self.profile_pillow(insertion_point)
-        mb.showerror('Внутренняя ошибка', f'Ошибка отрисовки профиля - {parameters.KEY_TYPE[key_type]}')"""
+            self.acadDoc.Utility.Prompt(f'Готово - {parameters.KEY_TYPE[key_type]}.\n')
+        except pythoncom.com_error as f:
+            print(f)
+            print(f'error {parameters.KEY_TYPE[key_type]}')
+            # self.profile_pillow(insertion_point)
+            mb.showerror('Внутренняя ошибка', f'Ошибка отрисовки профиля - {parameters.KEY_TYPE[key_type]}')

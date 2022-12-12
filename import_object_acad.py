@@ -156,5 +156,5 @@ class ImportCadObject:
         return distance_list
 
 
-main = ImportCadObject()
-main.import_basement('transh_111')
+#main = ImportCadObject()
+# main.import_basement('filling')

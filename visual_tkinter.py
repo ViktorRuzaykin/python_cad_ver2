@@ -88,7 +88,7 @@ def stat_draw():
         progressbar['value'] = 5
         window.update()
         if chk_state_ditch.get():
-            new_profile.profile_type_1(insertion_point=list_point_insert[0], key_type='ditch', difference_type='м')
+            new_profile.profile_type_1(insertion_point=list_point_insert[0], key_type='ditch')
             list_point_insert.pop(0)
             progressbar['value'] = value_bar[0]
             value_bar.pop(0)

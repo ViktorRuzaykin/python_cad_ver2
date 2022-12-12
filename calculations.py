@@ -201,7 +201,7 @@ class Calculations:
         return new_list_data
 
     @staticmethod
-    def mark_difference(marks_one, marks_second, difference_type):
+    def mark_difference(marks_one, marks_second):
         """
         Расчет разницы
         :param difference_type:
@@ -250,39 +250,3 @@ class Calculations:
             return all_distance[info_start['second_index']:info_stop['second_index']] + [second]
         else:
             return [one] + all_distance[info_start['second_index']:info_stop['second_index']] + [second]
-
-
-# calc = Calculations
-"""picket_int, picket_float, mark_pipe, mark_earth = calc.reader_base_file()
-print(picket_int, picket_float, mark_pipe, mark_earth)
-
-project_ditch, project_pillow, project_pipe, project_filling = calc.calc_project_marks(mark_pipe)
-actual_ditch, actual_pillow, actual_pipe, actual_filling = calc.cacl_actual_marks(project_ditch, project_pillow, project_pipe, project_filling)
-
-
-f_data = list(zip(picket_int, picket_float,
-                  project_pipe, mark_earth,
-                  project_ditch, actual_ditch,
-                  project_pillow, actual_pillow,
-                  actual_pipe,
-                  project_filling, actual_filling))
-f_data.insert(0, name_column)
-calc.write(f_data)
-pk_int, pk_float, project_pipe, mark_earth, project_ditch, actual_ditch, project_pillow, actual_pillow, actual_pipe, project_filling, actual_filling = calc.reader_final_file()
-
-print(project_pipe)
-f = utility.transform_pk_to_distance(pk_int, pk_float)
-print(f)
-p = utility.transform_pk_type_one(pk_int, pk_float)
-print(p)
-start_profile = calc.search_position_picketing(16.47, f)
-print(start_profile)
-mark_start = calc.interpolation_mark(start_profile, project_pipe)
-print(mark_start)
-stop_profile = calc.search_position_picketing(239.22, f)
-print(stop_profile)
-mark_stop = calc.interpolation_mark(stop_profile, project_pipe)
-print(mark_stop)
-new_data_list = calc.create_new_list_data(start_profile, stop_profile, mark_start, mark_stop, project_pipe)
-print(new_data_list)
-"""

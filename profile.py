@@ -52,6 +52,26 @@ class ProfileCad:
                                           alignment=alignment)
         self.acadDoc.Utility.Prompt(u'Итерация завершена.\n')  # для теста
 
+    def conditional_horizon_text(self, text, text_position, height_text, rotation, text_styles, alignment):
+        """
+        Подпись условного горизонта
+        :param text:
+        :param text_position:
+        :param height_text:
+        :param rotation:
+        :param text_styles:
+        :param alignment:
+        :return:
+        """
+        text_position = APoint(text_position[0], text_position[1])
+        self.add_objects.add_text_autocad(model=self.mSp,
+                                          text=text,
+                                          position=text_position,
+                                          height=height_text,
+                                          rotation=rotation,
+                                          text_styles=text_styles,
+                                          alignment=alignment)
+
     def create_header(self, insertion_point, path_file, text_style):
         """
         Создает шапку подвала
