@@ -44,7 +44,8 @@ class ImportCadObject:
             try:
                 self.bottom_right_corner_point = self.acadDoc.Utility.GetPoint(APoint(0, 0),
                                                                                'Правый нижний угол шапки подвала: \n')
-                selection = Autocad.get_selection('Выберите объекты подвала.\n')
+                selection = self.acad.get_selection('Выберите объекты подвала.\n')
+                time.sleep(0.1)
                 for cad_object in selection:
                     id_object = cad_object.ObjectID
                     if cad_object.ObjectName == 'AcDbLine':
@@ -106,8 +107,7 @@ class ImportCadObject:
                 create_new_text.StyleName = text_style
         self.acadDoc.Utility.Prompt(u'Подвал создан.\n')
 
-    @staticmethod
-    def import_project_marks(help_text):
+    def import_project_marks(self, help_text):
         """
         Импорт проектных отметок из AutoCad.
         :param help_text: подсказка для выбора.
@@ -119,7 +119,7 @@ class ImportCadObject:
             if keyboard.is_pressed('esc'):  # если нажата клавиша 'ESC' выходим из импорта
                 break
             try:
-                selection_marks = arryautocad.get_selection(help_text)
+                selection_marks = self.acad.get_selection(help_text)
                 for mark in selection_marks:
                     coord = float(mark.InsertionPoint[0]) * 1000
                     dict_mark[coord] = float(mark.TextString)
@@ -128,8 +128,7 @@ class ImportCadObject:
         dict_for_mark = dict(sorted(dict_mark.items()))
         return list(dict_for_mark.values())
 
-    @staticmethod
-    def import_distance_line(help_text):
+    def import_distance_line(self, help_text):
         """
         Импорт расстояний между отрезками из AutoCAD.
         :param help_text: текст подсказки для вывода в AutoCAD
@@ -142,7 +141,7 @@ class ImportCadObject:
             if keyboard.is_pressed('esc'):  # если нажата клавиша 'ESC' выходим из импорта
                 break
             try:
-                selection_marks = arryautocad.get_selection(help_text)
+                selection_marks = self.acad.get_selection(help_text)
                 for point in selection_marks:
                     insert_point.append(point.EndPoint[0])  # заполнения списка координатой "Х" отрезка "расстояний"
             except:
@@ -157,9 +156,5 @@ class ImportCadObject:
         return distance_list
 
 
-# main = ImportCadObject()
-# main.import_basement('transh')
-# main.create_basement_header([0, 0 ,0], 'transh')
-# main.import_basement('проетные отметки \n')
-# time.sleep(1)
-# print(main.import_distance_line('проектные отметкиыдели расстояния \n'))
+main = ImportCadObject()
+main.import_basement('transh_111')

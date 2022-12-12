@@ -27,7 +27,7 @@ class ProfileCad:
         :param height_text: высота текста
         :param dx: смещение точки от расчетной позиции
         """
-        time.sleep(0.1)
+        time.sleep(0.05)
         x, y = point_start[0], point_start[1]
 
         for item, increment in zip(object_cad, range(len(difference))):
@@ -60,7 +60,7 @@ class ProfileCad:
         :param insertion_point: точка вставки подвала
         :return:
         """
-        time.sleep(0.1)
+        time.sleep(0.03)
         self.create_basement_header.create_basement_header(insertion_point, path_file, text_style)
 
     def create_line_profile(self, insertion_point, difference, mark, scale_vertical, scale_horizontal, line_type,
@@ -87,6 +87,7 @@ class ProfileCad:
                 point_2_y = point_1_y + ((mark[i + 1] - mark[i]) * scale_vertical)
                 list_point.extend([point_2_x, point_2_y])
                 if vertical_line:
+                    time.sleep(0.03)
                     self.mSp.AddLine(APoint(point_1_x, insertion_point[1]), APoint(point_1_x, point_1_y))
                 point_1_x = point_2_x
                 point_1_y = point_2_y
@@ -113,8 +114,9 @@ class ProfileCad:
         point_1_x, point_1_y = insertion_point[0], insertion_point[1]
         point_2_x = insertion_point[0] + distances * scale_horizontal + dx
         point_2_y = insertion_point[1]
+        time.sleep(0.03)
         self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
-        time.sleep(0.2)
+        time.sleep(0.03)
         for step_in in step:
             point_1_y += step_in
             point_2_y += step_in
@@ -128,7 +130,7 @@ class ProfileCad:
         point_1_x, point_1_y = insertion_point[0] + 8.50, insertion_point[1]
         point_2_x, point_2_y = insertion_point[0] + 8.50, insertion_point[1] + sum(step)
         self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
-        time.sleep(0.2)
+        time.sleep(0.03)
         for value_dist in distances:
             point_1_x += value_dist * scale_horizontal
             point_2_x += value_dist * scale_horizontal

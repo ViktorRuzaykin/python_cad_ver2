@@ -79,7 +79,7 @@ class Calculations:
         :param top_pipe: если значение True, то отметки по верху трубы,
         :return: список проектных отметок по траншеи, подушке, трубе, обсыпке.
         """
-
+        print(top_pipe)
         ls_ditch, ls_pillow, ls_pipe, ls_filling = [], [], [], []
         for pipe in m_pipe:
             # вычисляем отметку дна траншеи
@@ -89,10 +89,10 @@ class Calculations:
             m_pillow = pipe - parameters.HEIGHT_PILLOW if top_pipe else pipe
             ls_pillow.append(round(m_pillow, parameters.DECIMAL_PLACES))
             # вычисляем отметку трубы
-            new_top_pipe = pipe if top_pipe else pipe + parameters.DIAMETER_PIPE
+            new_top_pipe = pipe
             ls_pipe.append(round(new_top_pipe, parameters.DECIMAL_PLACES))
             # вычисляем отметку присыпки
-            m_filling = pipe + parameters.HEIGHT_FILLING if top_pipe else pipe + parameters.DIAMETER_PIPE + parameters.HEIGHT_FILLING
+            m_filling = new_top_pipe + parameters.HEIGHT_FILLING if top_pipe else new_top_pipe + parameters.DIAMETER_PIPE + parameters.HEIGHT_FILLING
             ls_filling.append(round(m_filling, parameters.DECIMAL_PLACES))
         return ls_ditch, ls_pillow, ls_pipe, ls_filling
 
@@ -112,7 +112,7 @@ class Calculations:
             m_actual_ditch = ditch + random.randint(*parameters.VARIATION_DITCH) / 100
             if method_easy:
                 m_actual_pillow = pillow + random.randint(*parameters.VARIATION_PILLOW) / 100
-                m_actual_pipe = pipe + random.randint(*parameters.VARIATION_PIPE) / 100
+                m_actual_pipe = pipe + random.randint(*parameters.VARIATION_PIPE) / 1000
                 m_actual_filling = filling + random.randint(*parameters.VARIATION_FILLING) / 100
             else:
                 m_actual_pillow = m_actual_ditch + parameters.HEIGHT_PILLOW

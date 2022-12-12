@@ -1,8 +1,6 @@
-def format_decimal(number, decimal_places,):
-    try:
-        return "{:.{}f}".format(float(number), decimal_places)
-    except ValueError:
-        return number
+pipe = 10
+top_pipe = True
 
+m_pillow = pipe - 0.2 if top_pipe else pipe
 
-print(format_decimal(2.0, 0))
+print(m_pillow)

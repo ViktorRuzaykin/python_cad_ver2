@@ -12,11 +12,12 @@ OFFSET_NEW_PROFILE = 40
 WIDTH_BASEMENT = 100
 VARIATION_DITCH = (-5, 5)  # допуск для траншеи
 VARIATION_PILLOW = (-5, 5)  # допуск для подушки
-VARIATION_PIPE = (-3, 3)  # допуск для трубы
+VARIATION_PIPE = (-30, 30)  # допуск для трубы
 VARIATION_FILLING = (1, 5)  # допуск для присыпки
 HEIGHT_PILLOW = 0.20  # высота подушки
 DIAMETER_PIPE = 0.325  # диаметр трубы
 HEIGHT_FILLING = 0.30  # высота присыпки
+TOP_PIPE = False
 NAME_COLUMN = ('пк', 'плюс', 'H трубы', 'Н земли', 'Н транш', 'Н ф.транш', 'Н подуш', 'Н ф.подуш', 'Н ф.трубы',
                'Н обсып', 'Н ф.обсып')
 
@@ -37,7 +38,7 @@ STEP_HORIZONTAL_PILLOW = _step_hor  # шаг горизонтальных лин
 STEP_HORIZONTAL_PIPE = _step_hor  # шаг горизонтальных линий подвала укладки
 STEP_HORIZONTAL_FILLING = _step_hor  # шаг горизонтальных линий подвала обсыпки
 
-DECIMAL_PLACES = 2
+DECIMAL_PLACES = 3
 
 LEVEL_DITCH_PROJECT = 105.5
 LEVEL_DITCH_PK = 86.00
