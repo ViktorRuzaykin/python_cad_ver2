@@ -1,5 +1,14 @@
-parameters = {}
+import json
 
+
+def read_parameters():
+    with open('parameters.json', 'r') as outfile:
+        data = json.load(outfile)
+        return data
+
+
+param = read_parameters()
+print(param)
 SCALE_WIDTH = 1 / 7  # соотношение ширины шкалы, ширина к высоте
 CONDITIONAL_HORIZON = 5  # значение для определения условного горизонта
 OFFSET_TEXT_SCALE = 4  # отступ текста от шкалы профиля
