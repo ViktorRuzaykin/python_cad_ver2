@@ -1,7 +1,7 @@
 import os
 import sys
 import openpyxl
-from tkinter import messagebox as mb, Tk, Label
+from tkinter import messagebox as mb
 import auto_cad_ver5
 
 environ_list = ['COMPUTERNAME',

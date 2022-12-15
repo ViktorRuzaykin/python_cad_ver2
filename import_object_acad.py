@@ -2,6 +2,7 @@ import json
 import time
 import keyboard
 import arryautocad
+import utility
 from arryautocad import Autocad, APoint
 
 
@@ -75,7 +76,7 @@ class ImportCadObject:
 
     def create_basement_header(self, in_point, path_file, text_style):
 
-        point, line, text_cad = self.read_json_file(path_file=path_file)
+        point, line, text_cad = self.read_json_file(path_file=utility.resource_path(path_file))
         dx = in_point[0] - point[0]
         dy = in_point[1] - point[1]
         # отрисовка группы линий
@@ -91,6 +92,7 @@ class ImportCadObject:
             point_x, point_y = text_cad[text]['insertion_point'][0] + dx, text_cad[text]['insertion_point'][1] + dy
 
             if text_cad[text]['object_name'] == 'AcDbMText':
+                time.sleep(0.07)
                 create_new_mtext = self.mSp.AddMText(APoint(point_x, point_y), 0, text_cad[text]['text_string'])
                 create_new_mtext.Height = text_cad[text]['height']
                 create_new_mtext.Rotation = text_cad[text]['rotation']
@@ -105,7 +107,8 @@ class ImportCadObject:
                 create_new_text.Height = text_cad[text]['height']
                 create_new_text.Rotation = text_cad[text]['rotation']
                 create_new_text.StyleName = text_style
-        self.acadDoc.Utility.Prompt(u'Подвал создан.\n')
+        # self.acadDoc.Utility.Prompt(u'Подвал создан.\n')
+        self.acad.prompt('Подвал создан.\n')
 
     def import_project_marks(self, help_text):
         """
@@ -120,9 +123,10 @@ class ImportCadObject:
                 break
             try:
                 selection_marks = self.acad.get_selection(help_text)
+                time.sleep(0.3)
                 for mark in selection_marks:
                     coord = float(mark.InsertionPoint[0]) * 1000
-                    dict_mark[coord] = float(mark.TextString)
+                    dict_mark[coord] = float(mark.TextString.replace(',', '.'))
             except:
                 dict_mark.clear()
         dict_for_mark = dict(sorted(dict_mark.items()))
@@ -134,7 +138,7 @@ class ImportCadObject:
         :param help_text: текст подсказки для вывода в AutoCAD
         :return: список расстояний между точками
         """
-        time.sleep(0.2)
+        # time.sleep(0.2)
         insert_point = []
         distance_list = []
         while len(insert_point) == 0:
@@ -142,8 +146,10 @@ class ImportCadObject:
                 break
             try:
                 selection_marks = self.acad.get_selection(help_text)
+                time.sleep(0.3)
                 for point in selection_marks:
-                    insert_point.append(point.EndPoint[0])  # заполнения списка координатой "Х" отрезка "расстояний"
+                    # insert_point.append(point.EndPoint[0])  # заполнения списка координатой "Х" отрезка "расстояний"
+                    insert_point.append(point.StartPoint[0])  # заполнения списка координатой "Х" отрезка "расстояний"
             except:
                 insert_point.clear()
         insert_point = sorted(insert_point)

@@ -22,15 +22,16 @@ class FileCsv:
         project_marks_pipe = self.import_data.import_project_marks(help_text='Выдели отметки по трубе')
         project_marks_earth = self.import_data.import_project_marks(help_text='Выдели отметки по земле')
         project_distance = self.import_data.import_distance_line(help_text='Выдели отрезки расстояний')
-        picket_int, picket_float = utility.create_pk_int_float(project_distance, self.start_picket)
-        print(picket_int, picket_float)
-        data_write_base = list(zip(picket_int, picket_float, project_marks_pipe, project_marks_earth))
-        data_write_base.insert(0, parameters.NAME_COLUMN)
-        name_file_base = f'ПК{self.start_picket[0]}+{"{:.2f}".format(float(self.start_picket[1]))} ' \
-                         f'- ПК{picket_int[-1]}+{"{:.2f}".format(float(picket_float[-1]))}_base.csv'
-        self.calculations.write(data_write_base, name_file_base)
-        if picket_int:
-            return name_file_base
+        if project_distance, project_marks_earth, project_distance:
+            picket_int, picket_float = utility.create_pk_int_float(project_distance, self.start_picket)
+            data_write_base = list(zip(picket_int, picket_float, project_marks_pipe, project_marks_earth))
+            data_write_base.insert(0, parameters.NAME_COLUMN)
+            name_file_base = f'ПК{self.start_picket[0]}+{"{:.2f}".format(float(self.start_picket[1]))} ' \
+                             f'- ПК{picket_int[-1]}+{"{:.2f}".format(float(picket_float[-1]))}_base.csv'
+            self.calculations.write(data_write_base, name_file_base)
+
+            if picket_int:
+                return name_file_base
 
     def create_final_file(self, base_file):
         picket_int, picket_float, project_marks_pipe, project_marks_earth = self.calculations.reader_base_file(

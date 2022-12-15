@@ -1,16 +1,14 @@
+import os
+import sys
 from tkinter import Label, Tk, Entry, Button
 from tkinter import messagebox as mb, IntVar, ttk
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Checkbutton, Progressbar, Combobox
-
 import pythoncom
-
-import parameters
 import utility
 from arryautocad import Autocad
 from calculations import Calculations
 from create_profile import CreateProfile
-from import_object_acad import ImportCadObject
 from crate_file_csv import FileCsv
 
 final_data_file = None
@@ -25,6 +23,7 @@ try:
     list_styles = utility.list_styles(a_doc)
 except pythoncom.com_error:
     list_styles = []
+
 
 def open_work_file():
     global final_data_file
@@ -42,7 +41,6 @@ def open_work_file():
         open_file_lb.configure(text=name_file_final, background="#47fa41")
     except IndexError:
         return mb.showerror('Ошибка!', 'Файл не читается!')
-
 
 
 def stat_draw():
@@ -121,7 +119,11 @@ def stat_draw():
 
 def import_objects():
     started_pk = input_start_import_en.get().split('+')
-    print(started_pk)
+    if not started_pk or len(started_pk) == 1:
+        return mb.showerror(
+            'Ошибка импорта',
+            f'Не правильно введен стартовый пикет.\nШаблон: 0+00.00')
+
     create_base_file = FileCsv(start_picket=started_pk)
     name_file = create_base_file.create_base_file()
     if name_file:
@@ -143,12 +145,18 @@ def calc_actual():
         f'{name_file}')
 
 
+def resource_path(relative):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative)
+    return os.path.join(relative)
+
+
 window = Tk()
 window.title('Ленивчик')
 window.geometry('370x255')
-# path_ico = resource_path('kl.ico')
+path_ico = resource_path('kl.ico')
 window.resizable(width=True, height=True)
-# window.iconbitmap(path_ico)
+window.iconbitmap(path_ico)
 
 tab_control = ttk.Notebook(window)
 tab1 = ttk.Frame(tab_control)
@@ -159,7 +167,7 @@ tab_control.add(tab2, text='Расчет факта')
 tab_control.add(tab3, text='Импорт отметок')
 
 # ----------------------------------------- Вкладка 'Рисовалка' ------
-open_file_btn = Button(tab1, text='Открыть', command=open_work_file)  # command=file
+open_file_btn = Button(tab1, text='Открыть', command=open_work_file)
 open_file_btn.place(x=220, y=0)
 open_file_lb = Label(tab1, text='Выбери файл для чертилки -->', font=('Arial Bold', 9), background="#ff9d00")
 open_file_lb.place(x=20, y=3)
@@ -227,7 +235,7 @@ font_lb = Label(tab1, text='Шрифт:', font=('Arial Bold', 9))
 font_lb.place(x=5, y=140)
 font_combo = Combobox(tab1, width=23)
 font_combo['values'] = list_styles
-font_combo.set('СПДС')
+font_combo.set('Standard')
 font_combo.place(x=60, y=140)
 # кнопка старта отрисовки профиля
 start_draw = Button(tab1, text='Забабахать разом!', width=40, command=stat_draw)  # command=calc
@@ -253,6 +261,7 @@ start_lbl.place(x=5, y=30)
 
 input_start_import_en = Entry(tab3, width=15)
 input_start_import_en.place(x=130, y=30)
+input_start_import_en.insert(0, "0+00.00")
 
 import_objc_btn = Button(tab3, text='Импорт', width=12, command=import_objects)  # command=add_mark_in_excel
 import_objc_btn.place(x=230, y=27)

@@ -184,9 +184,6 @@ def autocad_len():
 
         name_file = f'           {pk_int[0]}+{pk_float[0]}0 - {pk_int[-1]}+{pk_float[-1]}         '
         lbl_1.configure(text=name_file, background="#47fa41")
-        print(mark_ditch)
-        print(pk_int)
-        print(pk_float)
 
     def calc():
         def style_text():
@@ -208,7 +205,6 @@ def autocad_len():
                 distance_pk.append(pk_int[pk] + '0' + pk_float[pk])
             else:
                 distance_pk.append(pk_int[pk] + pk_float[pk])
-        print(distance_pk)
 
         # контур шапки подвала
         def line_basement(height, width, dx):
@@ -694,7 +690,6 @@ def autocad_len():
                 try:
                     for mark in acad.get_selection(text=text):
                         coord = int(float(mark.InsertionPoint[0]) * 1000)
-                        print(coord)
                         dict_mark[coord] = float(mark.TextString)
                 except:
                     dict_mark.clear()

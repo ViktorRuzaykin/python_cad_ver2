@@ -1,3 +1,6 @@
+import os
+import sys
+
 import parameters
 
 
@@ -152,3 +155,14 @@ def list_styles(acad_doc):
         return [style.name for style in acad_doc.TextStyles if style.name]
     except:
         return []
+
+
+def resource_path(relative):
+    if hasattr(sys, "_MEIPASS"):
+        p = os.path.join(sys._MEIPASS, relative)
+        p = os.path.dirname(p)
+        if relative == 'verification.py':
+            return p
+        else:
+            return os.path.join(sys._MEIPASS, relative)
+    return os.path.join(relative)
