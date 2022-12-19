@@ -193,3 +193,14 @@ class ProfileCad:
         self.mSp.AddLine(APoint(point_1_x - scale_width, insertion_point[1]),
                          APoint(point_1_x - scale_width, point_1_y - scale_vertical))
 
+    def create_pk_type_second(self, insertion_point, difference, pickets):
+        point_1_x, point_1_y = insertion_point[0] + parameters.OFFSET_PROFILE, insertion_point[1] + parameters._step_hor[1]
+        point_2_x, point_2_y = insertion_point[0] + parameters.OFFSET_PROFILE, insertion_point[1] + parameters._step_hor[1] + 20
+        self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
+
+        for diff, picket in zip(difference, pickets):
+            point_1_x += diff
+            point_2_x += diff
+            self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
+
+

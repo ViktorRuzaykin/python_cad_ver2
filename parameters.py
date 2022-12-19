@@ -61,14 +61,18 @@ if param is not None:
     LEVEL_DITCH_DIFF = param['level_ditch_diff']
     LEVEL_DITCH_DEPTH = param['level_ditch_depth']
 
-    L1 = 92.00
-    L2 = 68.00
-    L3 = 24.00
-    L4 = 7.00
-    LEVEL_PILLOW_PROJECT, LEVEL_PIPE_PROJECT, LEVEL_FILLING_PROJECT = L1, L1, L1
-    LEVEL_PILLOW_PK, LEVEL_PIPE_PK, LEVEL_FILLING_PK = L2, L2, L2
-    LEVEL_PILLOW_ACTUAL, LEVEL_PIPE_ACTUAL, LEVEL_FILLING_ACTUAL = L3, L3, L3
-    LEVEL_PILLOW_DIFF, LEVEL_PIPE_DIFF, LEVEL_FILLING_DIFF = L4, L4, L4
+    LEVEL_PIPE_PROJECT = param['level_pipe_project'],
+    LEVEL_PIPE_ACTUAL = param['level_pipe_actual'],
+    LEVEL_PIPE_DIFF = param['level_pipe_diff'],
+    LEVEL_PIPE_DISTANCE = param['level_pipe_distance'],
+    LEVEL_PIPE_PK = param['level_pipe_pk'],
+
+    LEVEL_ACTUAL_1 = param['level_actual_1'],
+    LEVEL_PROJECT = param['level_project'],
+    LEVEL_ACTUAL = param['level_actual'],
+    LEVEL_DIFF = param['level_diff'],
+    LEVEL_DISTANCE = param['level_distance'],
+    LEVEL_PK = param['level_pk'],
 
     KEY_TYPE = {
         'ditch': param['key_type']['ditch'],

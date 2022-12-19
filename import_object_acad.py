@@ -74,7 +74,7 @@ class ImportCadObject:
             self.acadDoc.Utility.Prompt('Импорт завершен\n')
             print(self.info_text)
 
-    def create_basement_header(self, in_point, path_file, text_style):
+    def create_basement_header(self, in_point, path_file, text_style='Standard'):
 
         point, line, text_cad = self.read_json_file(path_file=utility.resource_path(path_file))
         dx = in_point[0] - point[0]
@@ -162,5 +162,7 @@ class ImportCadObject:
         return distance_list
 
 
-#main = ImportCadObject()
+# main = ImportCadObject()
 # main.import_basement('filling')
+
+
