@@ -22,7 +22,7 @@ class FileCsv:
         project_marks_pipe = self.import_data.import_project_marks(help_text='Выдели отметки по трубе')
         project_marks_earth = self.import_data.import_project_marks(help_text='Выдели отметки по земле')
         project_distance = self.import_data.import_distance_line(help_text='Выдели отрезки расстояний')
-        if project_distance, project_marks_earth, project_distance:
+        if (project_distance, project_marks_earth, project_distance):
             picket_int, picket_float = utility.create_pk_int_float(project_distance, self.start_picket)
             data_write_base = list(zip(picket_int, picket_float, project_marks_pipe, project_marks_earth))
             data_write_base.insert(0, parameters.NAME_COLUMN)

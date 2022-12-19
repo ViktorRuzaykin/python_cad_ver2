@@ -122,7 +122,7 @@ class CreateProfile:
                                               height_text=4,
                                               rotation=0,
                                               text_styles=self.text_style,
-                                              alignment=0)
+                                              alignment=12)
         insertion_point_ditch = [insertion_point[0] + parameters.OFFSET_PROFILE,
                                  insertion_point[1] + sum(parameters.STEP_HORIZONTAL_DITCH),
                                  insertion_point[2]]

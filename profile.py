@@ -1,4 +1,7 @@
 import time
+
+import pythoncom
+from tkinter import messagebox as mb
 import parameters
 import utility
 from arryautocad import APoint, ADouble
@@ -111,11 +114,14 @@ class ProfileCad:
                     self.mSp.AddLine(APoint(point_1_x, insertion_point[1]), APoint(point_1_x, point_1_y))
                 point_1_x = point_2_x
                 point_1_y = point_2_y
-                list_point.extend([point_1_x, point_1_y])
+                # list_point.extend([point_1_x, point_1_y])
             if vertical_line:
                 self.mSp.AddLine(APoint(point_1_x, insertion_point[1]), APoint(point_1_x, point_1_y))
             polyline = self.mSp.AddLightweightPolyline(ADouble(list_point))  # линия профиля
-            polyline.Linetype = line_type  # 'DASHED'
+            try:
+                polyline.Linetype = line_type  # 'DASHED'
+            except pythoncom.com_error:
+                pass
         except (AttributeError, TypeError):
             print('1_ошибка AttributeError, TypeError')
             self.create_line_profile(insertion_point, difference, mark, scale_vertical, scale_horizontal, line_type,
