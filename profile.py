@@ -114,7 +114,6 @@ class ProfileCad:
                     self.mSp.AddLine(APoint(point_1_x, insertion_point[1]), APoint(point_1_x, point_1_y))
                 point_1_x = point_2_x
                 point_1_y = point_2_y
-                # list_point.extend([point_1_x, point_1_y])
             if vertical_line:
                 self.mSp.AddLine(APoint(point_1_x, insertion_point[1]), APoint(point_1_x, point_1_y))
             polyline = self.mSp.AddLightweightPolyline(ADouble(list_point))  # линия профиля
