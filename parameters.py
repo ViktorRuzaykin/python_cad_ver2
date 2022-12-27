@@ -18,6 +18,8 @@ def read_parameters():
 
 
 param = read_parameters()
+
+
 if param is not None:
     SCALE_WIDTH = param['scale_width']  # соотношение ширины шкалы, ширина к высоте
     CONDITIONAL_HORIZON = param['conditional_horizon']  # значение для определения условного горизонта
@@ -60,19 +62,20 @@ if param is not None:
     LEVEL_DITCH_EARTH = param['level_ditch_earth']
     LEVEL_DITCH_DIFF = param['level_ditch_diff']
     LEVEL_DITCH_DEPTH = param['level_ditch_depth']
+    LEVEL_DITCH_DISTANCE = param['level_ditch_distance']
 
-    LEVEL_PIPE_PROJECT = param['level_pipe_project'],
-    LEVEL_PIPE_ACTUAL = param['level_pipe_actual'],
-    LEVEL_PIPE_DIFF = param['level_pipe_diff'],
-    LEVEL_PIPE_DISTANCE = param['level_pipe_distance'],
-    LEVEL_PIPE_PK = param['level_pipe_pk'],
+    LEVEL_PIPE_PROJECT = param['level_pipe_project']
+    LEVEL_PIPE_ACTUAL = param['level_pipe_actual']
+    LEVEL_PIPE_DIFF = param['level_pipe_diff']
+    LEVEL_PIPE_DISTANCE = param['level_pipe_distance']
+    LEVEL_PIPE_PK = param['level_pipe_pk']
 
-    LEVEL_ACTUAL_1 = param['level_actual_1'],
-    LEVEL_PROJECT = param['level_project'],
-    LEVEL_ACTUAL = param['level_actual'],
-    LEVEL_DIFF = param['level_diff'],
-    LEVEL_DISTANCE = param['level_distance'],
-    LEVEL_PK = param['level_pk'],
+    LEVEL_ACTUAL_2 = param['level_actual_2']
+    LEVEL_PROJECT = param['level_project']
+    LEVEL_ACTUAL_1 = param['level_actual_1']
+    LEVEL_DIFF = param['level_diff']
+    LEVEL_DISTANCE = param['level_distance']
+    LEVEL_PK = param['level_pk']
 
     KEY_TYPE = {
         'ditch': param['key_type']['ditch'],

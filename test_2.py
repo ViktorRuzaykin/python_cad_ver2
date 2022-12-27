@@ -1,59 +1,58 @@
 import time
+from pyautocad import Autocad, APoint, aDouble
 
+from pyacadcom import AcadPoint, AutoCAD, adouble
 import keyboard
 
-from arryautocad import Autocad
+# from arryautocad import Autocad, APoint, ADouble
 
-acad = Autocad()
-mSp = acad.active_model
-acadDoc = acad.active_doc
+acad = AutoCAD()
 
-def import_project_marks(help_text):
-    """
-    Импорт проектных отметок из AutoCad.
-    :param help_text: подсказка для выбора.
-    :return:
-    """
-    time.sleep(2)
-    dict_mark = {}
-    selection_marks = acad.get_selection(help_text)
-    time.sleep(0.3)
-    for mark in selection_marks:
-        coord = float(mark.InsertionPoint[0]) * 1000
-        dict_mark[coord] = float(mark.TextString.replace(',', '.'))
-        # str(text_int).replace(',', '.')
-    dict_for_mark = dict(sorted(dict_mark.items()))
-    return list(dict_for_mark.values())
+acadDoc = acad.ActiveDocument
+mSp = acadDoc.ModelSpace
+
+# flow
+# Document > BlocksCollection > Block > BlockReference
+
+# insertion point for block
+ip = AcadPoint(0, 0, 0).coordinates
 
 
-def import_distance_line(help_text):
-    """
-    Импорт расстояний между отрезками из AutoCAD.
-    :param help_text: текст подсказки для вывода в AutoCAD
-    :return: список расстояний между точками
-    """
-    # time.sleep(0.2)
-    insert_point = []
-    distance_list = []
-    while len(insert_point) == 0:
-        if keyboard.is_pressed('esc'):  # если нажата клавиша 'ESC' выходим из импорта
-            break
-        try:
-            selection_marks = acad.get_selection(help_text)
-            time.sleep(0.3)
-            for point in selection_marks:
-                # insert_point.append(point.EndPoint[0])  # заполнения списка координатой "Х" отрезка "расстояний"
-                insert_point.append(point.StartPoint[0])  # заполнения списка координатой "Х" отрезка "расстояний"
-        except:
-            insert_point.clear()
-    insert_point = sorted(insert_point)
-    for count, dist in enumerate(insert_point):
-        if count == len(insert_point) - 1:
-            break
-        d_var = abs(insert_point[count + 1] - dist)
-        if d_var != 0:
-            distance_list.append(round(d_var, 2))
-    return distance_list
+# adding block to documents block collection
+b1 = acadDoc.Blocks.Add(ip, "Test_block_1")
+
+# adding geometries to block
+lin = 0, 0, 0, 10000, 0, 0, 10000, 5000, 0, 0, 5000, 0, 0, 0, 0
+
+l = b1.AddLine(AcadPoint(0, 250, 0).coordinates, AcadPoint(10000, 250, 0).coordinates)
+pl = b1.AddPolyline(adouble(lin))
 
 
-print(import_project_marks('Выдели!\n'))
+
+"""#  выноска
+g = 0, 0, 0, 4, 4, 0, 5, 4, 0
+mtext = mSp.AddMText(APoint(4, 4, 0), 10, 'Text')
+mtext.TextString = 1
+mSp.AddLeader(ADouble(g), mtext, 0)"""
+
+
+def coords(coord):
+    g = [coord[0], coord[1], coord[2], coord[0] + 15, coord[1] + 15, coord[2]]
+    return adouble(g)
+
+
+j = acadDoc.Utility.GetInteger("Enter start num: ")
+for i in range(1, 9):
+
+    pt = acadDoc.Utility.GetPoint(AcadPoint(0, 0, 0).coordinates, 'GetPoint: ')
+    lead = mSp.AddMLeader(coords(pt), 0)
+    lead[0].TextString = j
+    lead[0].TextLeftAttachmentType = 7
+    j += 2
+    # time.sleep(0.5)
+
+
+
+# adding block instance to drawing (creating a reference to the block)
+# block_ref1 = mSp.InsertBlock(APoint(50, 50, 0), "Test_block_1", 1, 1, 1, 0)
+

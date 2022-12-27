@@ -86,7 +86,7 @@ class Calculations:
             m_ditch = pipe - parameters.DIAMETER_PIPE - parameters.HEIGHT_PILLOW if top_pipe else pipe - parameters.HEIGHT_PILLOW
             ls_ditch.append(round(m_ditch, parameters.DECIMAL_PLACES))
             # вычисляем отметку подушки
-            m_pillow = pipe - parameters.HEIGHT_PILLOW if top_pipe else pipe
+            m_pillow = pipe - parameters.DIAMETER_PIPE if top_pipe else pipe
             ls_pillow.append(round(m_pillow, parameters.DECIMAL_PLACES))
             # вычисляем отметку трубы
             new_top_pipe = pipe
@@ -115,7 +115,13 @@ class Calculations:
                 m_actual_pipe = pipe + random.randint(*parameters.VARIATION_PIPE) / 1000
                 m_actual_filling = filling + random.randint(*parameters.VARIATION_FILLING) / 100
             else:
-                m_actual_pillow = m_actual_ditch + parameters.HEIGHT_PILLOW
+                #  m_actual_pillow = m_actual_ditch + parameters.HEIGHT_PILLOW
+                x_actual_pillow = pillow + random.randint(*parameters.VARIATION_PILLOW) / 100
+                dx_pillow_fact_ditch = x_actual_pillow - m_actual_ditch
+                if dx_pillow_fact_ditch < parameters.HEIGHT_PILLOW:
+                    m_actual_pillow = x_actual_pillow + (parameters.HEIGHT_PILLOW - dx_pillow_fact_ditch)
+                else:
+                    m_actual_pillow = x_actual_pillow
                 m_actual_pipe = m_actual_pillow + parameters.DIAMETER_PIPE
                 m_actual_filling = filling + random.randint(*parameters.VARIATION_FILLING) / 100
             ls_actual_ditch.append(round(m_actual_ditch, parameters.DECIMAL_PLACES))

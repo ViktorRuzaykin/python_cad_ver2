@@ -41,7 +41,8 @@ class FileCsv:
         actual_ditch, actual_pillow, actual_pipe, actual_filling = self.calculations.cacl_actual_marks(project_ditch,
                                                                                                        project_pillow,
                                                                                                        project_pipe,
-                                                                                                       project_filling)
+                                                                                                       project_filling,
+                                                                                                       method_easy=False)
 
         data_write_final = list(zip(picket_int, picket_float,
                                     project_marks_pipe, project_marks_earth,

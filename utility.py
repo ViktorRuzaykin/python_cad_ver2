@@ -43,6 +43,30 @@ def transform_pk_type_one(pk_integer, pk_float):
     return pk
 
 
+def transform_pk_type_second(pk_integer, pk_float):
+    new_list_pk = [f'{int(pk_integer[0])}+{pk_float[0]}']
+    count = 0
+    for pk_int, pk_fl in zip(pk_integer, pk_float):
+        cutoff = len(str(pk_int)) - 1
+        if count == 0:
+            count += 1
+            continue
+        if count == len(pk_integer) - 1:
+            new_value_pk = f'{int(pk_int)}+{pk_fl}'
+            new_list_pk.append(new_value_pk)
+            break
+        if pk_fl == 0:
+            if str(pk_int)[cutoff:] == '0' or str(pk_int)[cutoff:] == '5':
+                new_value_pk = pk_int
+            else:
+                new_value_pk = str(pk_int)[cutoff:]
+        else:
+            new_value_pk = 'False'
+        new_list_pk.append(new_value_pk)
+        count += 1
+    return new_list_pk
+
+
 def conditional_horizon(*mark):
     """
     Вычисляет условный горизонт профиля.
@@ -154,7 +178,7 @@ def list_styles(acad_doc):
     try:
         return [style.name for style in acad_doc.TextStyles if style.name]
     except:
-        return []
+        return ['Standard']
 
 
 def resource_path(relative):
@@ -166,3 +190,13 @@ def resource_path(relative):
         else:
             return os.path.join(sys._MEIPASS, relative)
     return os.path.join(relative)
+def get_selection(active_doc, text="Выберите объекты"):
+    active_doc.Utility.Prompt(f'{text}.\n')
+    try:
+        active_doc.SelectionSets.Item("SS1").Delete()
+    except Exception:
+        print('Delete selection failed')
+
+    selection = active_doc.SelectionSets.Add('SS1')
+    selection.SelectOnScreen()
+    return selection

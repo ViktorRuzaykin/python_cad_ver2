@@ -6,7 +6,7 @@ from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Checkbutton, Progressbar, Combobox
 import pythoncom
 import utility
-from arryautocad import Autocad
+from pyacadcom import AutoCAD, AcadPoint
 from calculations import Calculations
 from create_profile import CreateProfile
 from crate_file_csv import FileCsv
@@ -18,11 +18,11 @@ pk_int_2 = 0
 pk_float_2 = 0
 
 try:
-    acad = Autocad()
-    a_doc = acad.active_doc
+    acad = AutoCAD(Visible=False)
+    a_doc = acad.ActiveDocument
     list_styles = utility.list_styles(a_doc)
 except pythoncom.com_error:
-    list_styles = []
+    list_styles = ['Standard']
 
 
 def open_work_file():
@@ -51,7 +51,8 @@ def stat_draw():
                                 end_profile=stop_pk,
                                 scale_vertical=float(scale_vertical_en.get()),
                                 scale_horizontal=float(scale_horizontal_en.get()),
-                                text_style=font_combo.get())
+                                text_style=font_combo.get(),
+                                scale_line=chk_state_scale.get())
 
     chk_state_list = [chk_state_ditch.get(), chk_state_pillow.get(), chk_state_pipe.get(), chk_state_filling.get()]
     if not final_data_file:
@@ -62,13 +63,13 @@ def stat_draw():
         return mb.showerror('Ошибка!', 'Конечный пикет больше начального.')
     if 1 in chk_state_list:
         try:
-            acad = Autocad()
+            acad = AutoCAD()
+            a_doc = acad.ActiveDocument
         except pythoncom.com_error as f:
             return mb.showerror(getattr(f, 'strerror'), getattr(f, 'strerror'))
         chk_state_list = [chk_state_ditch.get(), chk_state_pillow.get(), chk_state_pipe.get(),
                           chk_state_filling.get()]
-        acad = Autocad()
-        insertion_point = acad.get_point(text='Укажите точку вставки профиля: ')
+        insertion_point = a_doc.Utility.GetPoint(AcadPoint(0, 0, 0).coordinates, 'Укажите точку вставки профиля: \n')
 
         list_point_insert = utility.list_point_insert(chk_state_list=chk_state_list,
                                                       insert_point_start=insertion_point,
@@ -86,28 +87,28 @@ def stat_draw():
         progressbar['value'] = 5
         window.update()
         if chk_state_ditch.get():
-            new_profile.profile_type_1(insertion_point=list_point_insert[0], key_type='ditch')
+            new_profile.profile_type_1(insertion_point=list_point_insert[0], key_type='ditch', difference_type='м')
             list_point_insert.pop(0)
             progressbar['value'] = value_bar[0]
             value_bar.pop(0)
             window.update()
 
         if chk_state_pillow.get():
-            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pillow', difference_type='см')
+            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type_1='pillow', key_type_2='ditch', difference_type='м')
             list_point_insert.pop(0)
             progressbar['value'] = value_bar[0]
             value_bar.pop(0)
             window.update()
 
         if chk_state_pipe.get():
-            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='pipe', difference_type='мм')
+            new_profile.profile_type_3(insertion_point=list_point_insert[0], key_type_1='pipe', key_type_2=None, difference_type='м')
             list_point_insert.pop(0)
             progressbar['value'] = value_bar[0]
             value_bar.pop(0)
             window.update()
 
         if chk_state_filling.get():
-            new_profile.profile_type_2(insertion_point=list_point_insert[0], key_type='filling', difference_type='см')
+            new_profile.profile_type_4(insertion_point=list_point_insert[0], key_type_1='filling', key_type_2='pipe', difference_type='м')
             list_point_insert.pop(0)
             progressbar['value'] = value_bar[0]
             value_bar.pop(0)
@@ -127,7 +128,7 @@ def import_objects():
     create_base_file = FileCsv(start_picket=started_pk)
     name_file = create_base_file.create_base_file()
     if name_file:
-        acad.prompt(text='Готово.')
+        a_doc.Utility.Prompt(f'Готово.\n')
         mb.showinfo(
             'Добавлен файл',
             f'Добавлен файл: '
@@ -153,7 +154,7 @@ def resource_path(relative):
 
 window = Tk()
 window.title('Ленивчик')
-window.geometry('370x255')
+window.geometry('370x285')
 path_ico = resource_path('kl.ico')
 window.resizable(width=True, height=True)
 window.iconbitmap(path_ico)
@@ -184,14 +185,14 @@ start_pk_lb = Label(tab1, text='Начало ПК:', font=('Arial Bold', 9))
 start_pk_lb.place(x=5, y=30)
 start_pk_en = Entry(tab1, width=13)
 start_pk_en.place(x=85, y=30)
-start_pk_en.insert(0, "0+00.00")
+start_pk_en.insert(0, "5+00.00")
 
 # конечный ПК
 end_pk_lb = Label(tab1, text='Конец ПК:  ', font=('Arial Bold', 9))
 end_pk_lb.place(x=190, y=30)
 end_pk_en = Entry(tab1, width=13)
 end_pk_en.place(x=260, y=30)
-end_pk_en.insert(0, "0+00.00")
+end_pk_en.insert(0, "6+00.00")
 
 # масштаб отрисовки профиля
 scale_lb = Label(tab1, text='Масштаб профиля -', font=('Arial Bold', 9))
@@ -199,7 +200,7 @@ scale_lb.place(x=5, y=55)
 scale_vertical_lb = Label(tab1, text='В:', font=('Arial Bold', 9))
 scale_vertical_lb.place(x=130, y=55)
 scale_vertical_en = Entry(tab1, width=6)
-scale_vertical_en.insert(0, '200')
+scale_vertical_en.insert(0, '50')
 scale_vertical_en.place(x=150, y=55)
 scale_horizontal_lb = Label(tab1, text='Г:', font=('Arial Bold', 9))
 scale_horizontal_lb.place(x=200, y=55)
@@ -237,15 +238,20 @@ font_combo = Combobox(tab1, width=23)
 font_combo['values'] = list_styles
 font_combo.set('Standard')
 font_combo.place(x=60, y=140)
+# Checkbutton для отрисовки шкалы
+chk_state_scale = IntVar()
+chk_state_scale.set(0)
+chk_scale = Checkbutton(tab1, text='Шкала профиля', variable=chk_state_scale)
+chk_scale.place(x=50, y=170)
 # кнопка старта отрисовки профиля
 start_draw = Button(tab1, text='Забабахать разом!', width=40, command=stat_draw)  # command=calc
-start_draw.place(x=30, y=170)
+start_draw.place(x=30, y=200)
 
 # статус выполнения команды
 style = ttk.Style()
 progressbar = Progressbar(tab1, length=350, style='black.Horizontal.TProgressbar', mode='determinate', value=0,
                           maximum=100)
-progressbar.place(x=10, y=200)
+progressbar.place(x=10, y=230)
 # progressbar.start()
 
 # ----------------------------------------- Вкладка 'Расчет факта' ------

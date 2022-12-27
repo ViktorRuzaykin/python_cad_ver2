@@ -1,5 +1,7 @@
 import pythoncom
 import win32com.client
+from pyacadcom import AcadPoint, AutoCAD, adouble
+import pyautocad
 
 
 class Autocad:
@@ -8,7 +10,7 @@ class Autocad:
 
     @property
     def app(self):
-        self._app = win32com.client.GetActiveObject('AutoCAD.Application')
+        self._app = AutoCAD()
         return self._app
 
     @property

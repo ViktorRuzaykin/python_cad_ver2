@@ -1,18 +1,19 @@
 import json
 import time
 import keyboard
-import arryautocad
+# import arryautocad
 import utility
-from arryautocad import Autocad, APoint
+# from arryautocad import Autocad, APoint
+from pyacadcom import AcadPoint, AutoCAD, aDouble
 
 
 class ImportCadObject:
 
     def __init__(self):
         try:
-            self.acad = Autocad()
-            self.mSp = self.acad.active_model
-            self.acadDoc = self.acad.active_doc
+            self.acad = AutoCAD()
+            self.acadDoc = self.acad.ActiveDocument
+            self.mSp = self.acadDoc.ModelSpace
         except OSError:
             print('AutoCad не доступен')
         self.coord_line = {}
@@ -84,7 +85,7 @@ class ImportCadObject:
         for point in line:
             point_1_x, point_1_y = line[point][0][0] + dx, line[point][0][1] + dy
             point_2_x, point_2_y = line[point][1][0] + dx, line[point][1][1] + dy
-            self.mSp.AddLine(APoint(point_1_x, point_1_y), APoint(point_2_x, point_2_y))
+            self.mSp.AddLine(AcadPoint(point_1_x, point_1_y, 0).coordinates, AcadPoint(point_2_x, point_2_y, 0).coordinates)
 
         # заполнение шапки подвала текстом
         for text in text_cad:
@@ -93,22 +94,21 @@ class ImportCadObject:
 
             if text_cad[text]['object_name'] == 'AcDbMText':
                 time.sleep(0.07)
-                create_new_mtext = self.mSp.AddMText(APoint(point_x, point_y), 0, text_cad[text]['text_string'])
+                create_new_mtext = self.mSp.AddMText(AcadPoint(point_x, point_y, 0).coordinates, 0, text_cad[text]['text_string'])
                 create_new_mtext.Height = text_cad[text]['height']
                 create_new_mtext.Rotation = text_cad[text]['rotation']
                 create_new_mtext.StyleName = text_style
                 create_new_mtext.Width = text_cad[text]['width']
                 create_new_mtext.AttachmentPoint = text_cad[text]['attachment_point']
-                point_coordinates = APoint(point_x, point_y, 0.00)
+                point_coordinates = AcadPoint(point_x, point_y, 0.00).coordinates
                 create_new_mtext.InsertionPoint = point_coordinates
 
             if text_cad[text]['object_name'] == 'AcDbText':
-                create_new_text = self.mSp.AddText(text_cad[text]['text_string'], APoint(point_x, point_y), 1)
+                create_new_text = self.mSp.AddText(text_cad[text]['text_string'], AcadPoint(point_x, point_y, 0).coordinates, 1)
                 create_new_text.Height = text_cad[text]['height']
                 create_new_text.Rotation = text_cad[text]['rotation']
                 create_new_text.StyleName = text_style
-        # self.acadDoc.Utility.Prompt(u'Подвал создан.\n')
-        self.acad.prompt('Подвал создан.\n')
+        self.acadDoc.Utility.Prompt(u'Подвал создан.\n')
 
     def import_project_marks(self, help_text):
         """
@@ -122,7 +122,7 @@ class ImportCadObject:
             if keyboard.is_pressed('esc'):  # если нажата клавиша 'ESC' выходим из импорта
                 break
             try:
-                selection_marks = self.acad.get_selection(help_text)
+                selection_marks = utility.get_selection(active_doc=self.acadDoc, text=help_text)
                 time.sleep(0.3)
                 for mark in selection_marks:
                     coord = float(mark.InsertionPoint[0]) * 1000
@@ -145,7 +145,7 @@ class ImportCadObject:
             if keyboard.is_pressed('esc'):  # если нажата клавиша 'ESC' выходим из импорта
                 break
             try:
-                selection_marks = self.acad.get_selection(help_text)
+                selection_marks = utility.get_selection(active_doc=self.acadDoc, text=help_text)
                 time.sleep(0.3)
                 for point in selection_marks:
                     # insert_point.append(point.EndPoint[0])  # заполнения списка координатой "Х" отрезка "расстояний"

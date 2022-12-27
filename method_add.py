@@ -9,7 +9,6 @@ class AddObject:
         Создает простой текст в AutoCAD
         """
         try:
-            time.sleep(0.01)
             new_text = model.AddText(text, position, height)
             new_text.Rotation = rotation
             new_text.StyleName = text_styles
